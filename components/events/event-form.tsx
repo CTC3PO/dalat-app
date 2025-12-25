@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import { PlaceAutocomplete } from "@/components/events/place-autocomplete";
 import type { Event } from "@/lib/types";
 
 interface EventFormProps {
@@ -170,45 +171,20 @@ export function EventForm({ userId, event }: EventFormProps) {
             </div>
           </div>
 
-          {/* Location */}
-          <div className="space-y-2">
-            <Label htmlFor="location_name">Location name</Label>
-            <Input
-              id="location_name"
-              name="location_name"
-              placeholder="The Married Beans"
-              defaultValue={event?.location_name ?? ""}
-            />
-          </div>
-
-          {/* Address */}
-          <div className="space-y-2">
-            <Label htmlFor="address">Address</Label>
-            <Input
-              id="address"
-              name="address"
-              placeholder="123 Nguyen Van Troi, Ward 1, Da Lat"
-              defaultValue={event?.address ?? ""}
-            />
-            <p className="text-xs text-muted-foreground">
-              Street address for Grab drivers
-            </p>
-          </div>
-
-          {/* Google Maps URL */}
-          <div className="space-y-2">
-            <Label htmlFor="google_maps_url">Google Maps link</Label>
-            <Input
-              id="google_maps_url"
-              name="google_maps_url"
-              type="url"
-              placeholder="https://maps.google.com/..."
-              defaultValue={event?.google_maps_url ?? ""}
-            />
-            <p className="text-xs text-muted-foreground">
-              Paste a Google Maps link for the location
-            </p>
-          </div>
+          {/* Location (Google Places Autocomplete) */}
+          <PlaceAutocomplete
+            onPlaceSelect={() => {}}
+            defaultValue={
+              event?.location_name
+                ? {
+                    placeId: "",
+                    name: event.location_name,
+                    address: event.address || "",
+                    googleMapsUrl: event.google_maps_url || "",
+                  }
+                : null
+            }
+          />
 
           {/* External chat URL */}
           <div className="space-y-2">
