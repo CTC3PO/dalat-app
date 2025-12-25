@@ -144,7 +144,7 @@ export default async function EventPage({ params }: PageProps) {
             </div>
 
             {/* Attendees */}
-            {isLoggedIn && attendees.length > 0 && (
+            {attendees.length > 0 && (
               <Card>
                 <CardContent className="p-4">
                   <h3 className="font-semibold mb-3">
