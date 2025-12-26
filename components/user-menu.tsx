@@ -2,8 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
-import { LogOut, Moon, Sun, Laptop, User } from "lucide-react";
+import { useEffect, useState, useTransition } from "react";
+import { LogOut, Moon, Sun, Laptop, User, Globe } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import {
   DropdownMenu,
@@ -16,17 +16,23 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { LOCALE_NAMES, LOCALE_FLAGS, SUPPORTED_LOCALES } from "@/lib/locale";
+import type { Locale } from "@/lib/types";
 
 interface UserMenuProps {
   avatarUrl: string | null;
   displayName: string | null;
   username: string | null;
+  userId: string;
+  currentLocale: Locale;
 }
 
-export function UserMenu({ avatarUrl, displayName, username }: UserMenuProps) {
+export function UserMenu({ avatarUrl, displayName, username, userId, currentLocale }: UserMenuProps) {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [locale, setLocale] = useState<Locale>(currentLocale);
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     setMounted(true);
@@ -37,6 +43,18 @@ export function UserMenu({ avatarUrl, displayName, username }: UserMenuProps) {
     await supabase.auth.signOut();
     router.push("/");
     router.refresh();
+  };
+
+  const changeLocale = (newLocale: Locale) => {
+    setLocale(newLocale);
+    const supabase = createClient();
+    startTransition(async () => {
+      await supabase
+        .from("profiles")
+        .update({ locale: newLocale })
+        .eq("id", userId);
+      router.refresh();
+    });
   };
 
   const ThemeIcon = theme === "light" ? Sun : theme === "dark" ? Moon : Laptop;
@@ -81,6 +99,23 @@ export function UserMenu({ avatarUrl, displayName, username }: UserMenuProps) {
               <Laptop className="w-4 h-4 mr-2" />
               System
             </DropdownMenuItem>
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
+
+        {/* Language submenu */}
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger disabled={isPending}>
+            <Globe className="w-4 h-4 mr-2" />
+            {LOCALE_FLAGS[locale]} {LOCALE_NAMES[locale]}
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent>
+            {SUPPORTED_LOCALES.map((l) => (
+              <DropdownMenuItem key={l} onClick={() => changeLocale(l)}>
+                <span className="mr-2">{LOCALE_FLAGS[l]}</span>
+                {LOCALE_NAMES[l]}
+                {l === locale && <span className="ml-auto">✓</span>}
+              </DropdownMenuItem>
+            ))}
           </DropdownMenuSubContent>
         </DropdownMenuSub>
 
