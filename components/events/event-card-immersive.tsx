@@ -101,6 +101,11 @@ export function EventCardImmersive({ event, counts }: EventCardImmersiveProps) {
                   {isFull && (
                     <span className="ml-1 text-orange-400">(Full)</span>
                   )}
+                  {(counts?.interested_count ?? 0) > 0 && (
+                    <span className="ml-1 text-white/70">
+                      &middot; {counts?.interested_count} interested
+                    </span>
+                  )}
                   {(counts?.waitlist_count ?? 0) > 0 && (
                     <span className="ml-1 text-white/70">
                       &middot; {counts?.waitlist_count} waitlist

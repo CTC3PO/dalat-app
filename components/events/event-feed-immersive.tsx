@@ -37,6 +37,7 @@ async function getEventCounts(eventIds: string[]) {
     const eventRsvps = rsvps?.filter((r) => r.event_id === eventId) || [];
     const goingRsvps = eventRsvps.filter((r) => r.status === "going");
     const waitlistRsvps = eventRsvps.filter((r) => r.status === "waitlist");
+    const interestedRsvps = eventRsvps.filter((r) => r.status === "interested");
 
     counts[eventId] = {
       event_id: eventId,
@@ -46,6 +47,7 @@ async function getEventCounts(eventIds: string[]) {
         (sum, r) => sum + 1 + (r.plus_ones || 0),
         0
       ),
+      interested_count: interestedRsvps.length,
     };
   }
 

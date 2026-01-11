@@ -73,7 +73,7 @@ export interface Rsvp {
   id: string;
   event_id: string;
   user_id: string;
-  status: "going" | "waitlist" | "cancelled";
+  status: "going" | "waitlist" | "cancelled" | "interested";
   plus_ones: number;
   created_at: string;
   // Joined data
@@ -85,6 +85,7 @@ export interface EventCounts {
   going_count: number;
   going_spots: number;
   waitlist_count: number;
+  interested_count: number;
 }
 
 // AI Extraction types

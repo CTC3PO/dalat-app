@@ -103,6 +103,11 @@ export function EventCard({ event, counts }: EventCardProps) {
                   {isFull && (
                     <span className="ml-1 text-orange-500">(Full)</span>
                   )}
+                  {(counts?.interested_count ?? 0) > 0 && (
+                    <span className="ml-1 text-muted-foreground">
+                      &middot; {counts?.interested_count} interested
+                    </span>
+                  )}
                   {(counts?.waitlist_count ?? 0) > 0 && (
                     <span className="ml-1 text-muted-foreground">
                       &middot; {counts?.waitlist_count} waitlist

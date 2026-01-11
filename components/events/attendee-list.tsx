@@ -7,20 +7,23 @@ type RsvpWithProfile = Rsvp & { profiles: Profile };
 interface AttendeeListProps {
   attendees: RsvpWithProfile[];
   waitlist: RsvpWithProfile[];
+  interested?: RsvpWithProfile[];
 }
 
 function AttendeeChip({
   rsvp,
-  isWaitlist = false,
+  variant = "default",
 }: {
   rsvp: RsvpWithProfile;
-  isWaitlist?: boolean;
+  variant?: "default" | "waitlist" | "interested";
 }) {
+  const isSecondary = variant === "waitlist" || variant === "interested";
+
   return (
     <Link
       href={`/${rsvp.profiles?.username || rsvp.user_id}`}
       className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm transition-colors ${
-        isWaitlist
+        isSecondary
           ? "bg-transparent border border-dashed border-muted-foreground/40 text-muted-foreground hover:border-muted-foreground/60"
           : "bg-muted hover:bg-muted/80"
       }`}
@@ -29,11 +32,11 @@ function AttendeeChip({
         <img
           src={rsvp.profiles.avatar_url}
           alt=""
-          className={`w-5 h-5 rounded-full ${isWaitlist ? "opacity-60" : ""}`}
+          className={`w-5 h-5 rounded-full ${isSecondary ? "opacity-60" : ""}`}
         />
       ) : (
         <div
-          className={`w-5 h-5 rounded-full ${isWaitlist ? "bg-muted-foreground/20" : "bg-primary/20"}`}
+          className={`w-5 h-5 rounded-full ${isSecondary ? "bg-muted-foreground/20" : "bg-primary/20"}`}
         />
       )}
       <span>
@@ -46,8 +49,8 @@ function AttendeeChip({
   );
 }
 
-export function AttendeeList({ attendees, waitlist }: AttendeeListProps) {
-  if (attendees.length === 0 && waitlist.length === 0) return null;
+export function AttendeeList({ attendees, waitlist, interested = [] }: AttendeeListProps) {
+  if (attendees.length === 0 && waitlist.length === 0 && interested.length === 0) return null;
 
   return (
     <Card>
@@ -72,7 +75,24 @@ export function AttendeeList({ attendees, waitlist }: AttendeeListProps) {
             </div>
             <div className="flex flex-wrap gap-2">
               {waitlist.map((rsvp) => (
-                <AttendeeChip key={rsvp.id} rsvp={rsvp} isWaitlist />
+                <AttendeeChip key={rsvp.id} rsvp={rsvp} variant="waitlist" />
+              ))}
+            </div>
+          </>
+        )}
+
+        {interested.length > 0 && (
+          <>
+            <div className="flex items-center gap-3 my-4">
+              <div className="h-px flex-1 bg-border" />
+              <span className="text-xs text-muted-foreground">
+                Interested ({interested.length})
+              </span>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {interested.map((rsvp) => (
+                <AttendeeChip key={rsvp.id} rsvp={rsvp} variant="interested" />
               ))}
             </div>
           </>

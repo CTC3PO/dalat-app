@@ -196,6 +196,19 @@ async function getWaitlist(eventId: string): Promise<(Rsvp & { profiles: Profile
   return (data ?? []) as (Rsvp & { profiles: Profile })[];
 }
 
+async function getInterestedUsers(eventId: string): Promise<(Rsvp & { profiles: Profile })[]> {
+  const supabase = await createClient();
+
+  const { data } = await supabase
+    .from("rsvps")
+    .select("*, profiles(*)")
+    .eq("event_id", eventId)
+    .eq("status", "interested")
+    .order("created_at", { ascending: true });
+
+  return (data ?? []) as (Rsvp & { profiles: Profile })[];
+}
+
 async function getCurrentUserId(): Promise<string | null> {
   const supabase = await createClient();
   const {
@@ -231,11 +244,12 @@ export default async function EventPage({ params, searchParams }: PageProps) {
 
   const currentUserId = await getCurrentUserId();
 
-  const [counts, currentRsvp, attendees, waitlist, waitlistPosition, organizerEvents] = await Promise.all([
+  const [counts, currentRsvp, attendees, waitlist, interested, waitlistPosition, organizerEvents] = await Promise.all([
     getEventCounts(event.id),
     getCurrentUserRsvp(event.id),
     getAttendees(event.id),
     getWaitlist(event.id),
+    getInterestedUsers(event.id),
     getWaitlistPosition(event.id, currentUserId),
     event.organizer_id ? getOrganizerEvents(event.organizer_id) : Promise.resolve([]),
   ]);
@@ -289,7 +303,7 @@ export default async function EventPage({ params, searchParams }: PageProps) {
             </div>
 
             {/* Attendees */}
-            <AttendeeList attendees={attendees} waitlist={waitlist} />
+            <AttendeeList attendees={attendees} waitlist={waitlist} interested={interested} />
           </div>
 
           {/* Sidebar */}
@@ -342,7 +356,14 @@ export default async function EventPage({ params, searchParams }: PageProps) {
                 <div className="flex items-center gap-3">
                   <Users className="w-5 h-5 text-muted-foreground" />
                   <div>
-                    <p className="font-medium">{spotsText} going</p>
+                    <p className="font-medium">
+                      {spotsText} going
+                      {(counts?.interested_count ?? 0) > 0 && (
+                        <span className="text-muted-foreground font-normal">
+                          {" "}· {counts?.interested_count} interested
+                        </span>
+                      )}
+                    </p>
                     {(counts?.waitlist_count ?? 0) > 0 && (
                       <p className="text-sm text-muted-foreground">
                         {counts?.waitlist_count} on waitlist

@@ -30,6 +30,7 @@ export function RsvpButton({
   const isFull = capacity ? goingSpots >= capacity : false;
   const isGoing = currentRsvp?.status === "going";
   const isWaitlist = currentRsvp?.status === "waitlist";
+  const isInterested = currentRsvp?.status === "interested";
 
   async function handleRsvp() {
     if (!isLoggedIn) {
@@ -58,6 +59,48 @@ export function RsvpButton({
           body: JSON.stringify({ eventId }),
         }).catch(console.error);
       }
+
+      router.refresh();
+    });
+  }
+
+  async function handleInterested() {
+    if (!isLoggedIn) {
+      router.push("/auth/login");
+      return;
+    }
+
+    setError(null);
+    const supabase = createClient();
+
+    startTransition(async () => {
+      const { data, error: rpcError } = await supabase.rpc("mark_interested", {
+        p_event_id: eventId,
+      });
+
+      if (rpcError) {
+        setError(rpcError.message);
+        return;
+      }
+
+      // Handle waitlist promotion if user switched from going
+      if (data?.promoted_user) {
+        fetch("/api/notifications/cancel", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            eventId,
+            promotedUserId: data.promoted_user,
+          }),
+        }).catch(console.error);
+      }
+
+      // Schedule reminders for interested users
+      fetch("/api/notifications/interested", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ eventId }),
+      }).catch(console.error);
 
       router.refresh();
     });
@@ -93,17 +136,28 @@ export function RsvpButton({
     });
   }
 
+  // STATE: User is going
   if (isGoing) {
     return (
       <div className="space-y-2">
-        <Button
-          onClick={handleCancel}
-          disabled={isPending}
-          variant="outline"
-          className="w-full"
-        >
-          {isPending ? "Cancelling..." : "Cancel RSVP"}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={handleCancel}
+            disabled={isPending}
+            variant="outline"
+            className="flex-1"
+          >
+            {isPending ? "..." : "Cancel RSVP"}
+          </Button>
+          <Button
+            onClick={handleInterested}
+            disabled={isPending}
+            variant="ghost"
+            className="flex-1"
+          >
+            {isPending ? "..." : "Just interested"}
+          </Button>
+        </div>
         <p className="text-sm text-green-600 text-center">
           You&apos;re going!
         </p>
@@ -112,17 +166,28 @@ export function RsvpButton({
     );
   }
 
+  // STATE: User is on waitlist
   if (isWaitlist) {
     return (
       <div className="space-y-2">
-        <Button
-          onClick={handleCancel}
-          disabled={isPending}
-          variant="outline"
-          className="w-full"
-        >
-          {isPending ? "Leaving..." : "Leave waitlist"}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={handleCancel}
+            disabled={isPending}
+            variant="outline"
+            className="flex-1"
+          >
+            {isPending ? "..." : "Leave waitlist"}
+          </Button>
+          <Button
+            onClick={handleInterested}
+            disabled={isPending}
+            variant="ghost"
+            className="flex-1"
+          >
+            {isPending ? "..." : "Just interested"}
+          </Button>
+        </div>
         <div className="text-center space-y-1">
           <p className="text-sm text-orange-600 font-medium">
             You&apos;re #{waitlistPosition} on the waitlist
@@ -136,19 +201,55 @@ export function RsvpButton({
     );
   }
 
+  // STATE: User is interested
+  if (isInterested) {
+    return (
+      <div className="space-y-2">
+        <div className="flex gap-2">
+          <Button
+            onClick={handleRsvp}
+            disabled={isPending}
+            className="flex-1"
+          >
+            {isPending ? "..." : isFull ? "Join waitlist" : "I'm going"}
+          </Button>
+          <Button
+            onClick={handleCancel}
+            disabled={isPending}
+            variant="outline"
+            className="flex-1"
+          >
+            {isPending ? "..." : "Not interested"}
+          </Button>
+        </div>
+        <p className="text-sm text-blue-600 text-center">
+          You&apos;re interested
+        </p>
+        {error && <p className="text-sm text-red-500 text-center">{error}</p>}
+      </div>
+    );
+  }
+
+  // DEFAULT STATE: No RSVP - show side-by-side buttons
   return (
     <div className="space-y-2">
-      <Button
-        onClick={handleRsvp}
-        disabled={isPending}
-        className="w-full"
-      >
-        {isPending
-          ? "..."
-          : isFull
-            ? "Join waitlist"
-            : "I'm going"}
-      </Button>
+      <div className="flex gap-2">
+        <Button
+          onClick={handleRsvp}
+          disabled={isPending}
+          className="flex-1"
+        >
+          {isPending ? "..." : isFull ? "Join waitlist" : "I'm going"}
+        </Button>
+        <Button
+          onClick={handleInterested}
+          disabled={isPending}
+          variant="outline"
+          className="flex-1"
+        >
+          {isPending ? "..." : "Interested"}
+        </Button>
+      </div>
       {error && <p className="text-sm text-red-500 text-center">{error}</p>}
     </div>
   );
