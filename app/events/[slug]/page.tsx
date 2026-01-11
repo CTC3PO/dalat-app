@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { ArrowLeft, Calendar, MapPin, Users, ExternalLink, MessageCircle } from "lucide-react";
+import { ArrowLeft, Calendar, MapPin, Users, ExternalLink, Link2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent } from "@/components/ui/card";
 import { RsvpButton } from "@/components/events/rsvp-button";
@@ -299,7 +299,7 @@ export default async function EventPage({ params }: PageProps) {
                   </div>
                 </div>
 
-                {/* External chat link */}
+                {/* External link */}
                 {event.external_chat_url && (
                   <a
                     href={event.external_chat_url}
@@ -307,8 +307,8 @@ export default async function EventPage({ params }: PageProps) {
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 text-sm text-primary hover:underline"
                   >
-                    <MessageCircle className="w-4 h-4" />
-                    Join the chat
+                    <Link2 className="w-4 h-4" />
+                    More info
                     <ExternalLink className="w-3 h-3" />
                   </a>
                 )}

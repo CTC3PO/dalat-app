@@ -206,18 +206,18 @@ export function EventForm({ userId, event }: EventFormProps) {
             }
           />
 
-          {/* External chat URL */}
+          {/* External link */}
           <div className="space-y-2">
-            <Label htmlFor="external_chat_url">Chat group link</Label>
+            <Label htmlFor="external_chat_url">External link</Label>
             <Input
               id="external_chat_url"
               name="external_chat_url"
               type="url"
-              placeholder="https://zalo.me/g/... or WhatsApp link"
+              placeholder="https://..."
               defaultValue={event?.external_chat_url ?? ""}
             />
             <p className="text-xs text-muted-foreground">
-              Zalo, WhatsApp, or Facebook group link
+              Link to a form, chat group, website, or social media
             </p>
           </div>
 
