@@ -14,6 +14,7 @@ import { AttendeeList } from "@/components/events/attendee-list";
 import { EventMediaDisplay } from "@/components/events/event-media-display";
 import { formatInDaLat } from "@/lib/timezone";
 import { MoreFromOrganizer } from "@/components/events/more-from-organizer";
+import { Linkify } from "@/lib/linkify";
 import type { Event, EventCounts, Rsvp, Profile, Organizer } from "@/lib/types";
 
 interface PageProps {
@@ -296,9 +297,9 @@ export default async function EventPage({ params, searchParams }: PageProps) {
             <div>
               <h1 className="text-3xl font-bold mb-4">{event.title}</h1>
               {event.description && (
-                <p className="text-muted-foreground whitespace-pre-wrap">
-                  {event.description}
-                </p>
+                <div className="text-muted-foreground whitespace-pre-wrap">
+                  <Linkify text={event.description} />
+                </div>
               )}
             </div>
 
