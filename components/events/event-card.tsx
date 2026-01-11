@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Calendar, MapPin, Users, Expand } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { ImageLightbox } from "@/components/ui/image-lightbox";
+import { EventDefaultImage } from "@/components/events/event-default-image";
 import { formatInDaLat } from "@/lib/timezone";
 import { isVideoUrl } from "@/lib/media-utils";
 import type { Event, EventCounts } from "@/lib/types";
@@ -32,14 +33,14 @@ export function EventCard({ event, counts }: EventCardProps) {
     <>
       <Card className="overflow-hidden hover:border-foreground/20 transition-colors">
         {/* Image area - opens lightbox */}
-        {hasImage && (
-          <button
-            type="button"
-            onClick={() => !imageIsVideo && setLightboxOpen(true)}
-            className="w-full aspect-[4/5] relative overflow-hidden group cursor-pointer"
-            aria-label={imageIsVideo ? "Video preview" : "View full flyer"}
-          >
-            {imageIsVideo ? (
+        <button
+          type="button"
+          onClick={() => hasImage && !imageIsVideo && setLightboxOpen(true)}
+          className="w-full aspect-[4/5] relative overflow-hidden group cursor-pointer"
+          aria-label={hasImage && imageIsVideo ? "Video preview" : "View full flyer"}
+        >
+          {hasImage ? (
+            imageIsVideo ? (
               <video
                 src={event.image_url!}
                 className="object-cover w-full h-full"
@@ -62,9 +63,15 @@ export function EventCard({ event, counts }: EventCardProps) {
                   </div>
                 </div>
               </>
-            )}
-          </button>
-        )}
+            )
+          ) : (
+            /* Default image when no event image is provided */
+            <EventDefaultImage
+              title={event.title}
+              className="object-cover w-full h-full"
+            />
+          )}
+        </button>
 
         {/* Text area - navigates to event page */}
         <Link href={`/events/${event.slug}`} prefetch={false}>
