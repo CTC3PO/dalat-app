@@ -15,7 +15,8 @@ export default function SettingsLayout({
           <div className="flex items-center gap-4">
             <Link
               href="/"
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+              className="-ml-2 flex items-center gap-2 text-muted-foreground hover:text-foreground active:text-foreground active:scale-95 transition-all p-2 rounded-lg"
+              aria-label="Back to home"
             >
               <ArrowLeft className="w-4 h-4" />
             </Link>

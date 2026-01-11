@@ -14,7 +14,7 @@ export default function ProtectedLayout({
         <div className="container flex h-14 max-w-4xl items-center justify-between mx-auto px-4">
           <Link
             href="/"
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+            className="-ml-3 flex items-center gap-2 text-muted-foreground hover:text-foreground active:text-foreground active:scale-95 transition-all px-3 py-2 rounded-lg"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back</span>
