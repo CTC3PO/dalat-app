@@ -1,17 +1,21 @@
+import { Suspense } from "react";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { EventCardImmersive } from "./event-card-immersive";
+import { EventFeedTabs, type EventLifecycle } from "./event-feed-tabs";
 import type { Event, EventCounts } from "@/lib/types";
 
-async function getEvents() {
+interface EventFeedImmersiveProps {
+  lifecycle?: EventLifecycle;
+}
+
+async function getEventsByLifecycle(lifecycle: EventLifecycle) {
   const supabase = await createClient();
 
-  const { data: events, error } = await supabase
-    .from("events")
-    .select("*")
-    .eq("status", "published")
-    .gte("starts_at", new Date().toISOString())
-    .order("starts_at", { ascending: true })
-    .limit(20);
+  const { data: events, error } = await supabase.rpc("get_events_by_lifecycle", {
+    p_lifecycle: lifecycle,
+    p_limit: 20,
+  });
 
   if (error) {
     console.error("Error fetching events:", error);
@@ -54,33 +58,66 @@ async function getEventCounts(eventIds: string[]) {
   return counts;
 }
 
-export async function EventFeedImmersive() {
-  const events = await getEvents();
+function FloatingTabs({ activeTab }: { activeTab: EventLifecycle }) {
+  return (
+    <Suspense fallback={null}>
+      <EventFeedTabs activeTab={activeTab} variant="floating" useUrlNavigation />
+    </Suspense>
+  );
+}
+
+export async function EventFeedImmersive({ lifecycle = "upcoming" }: EventFeedImmersiveProps) {
+  const events = await getEventsByLifecycle(lifecycle);
   const eventIds = events.map((e) => e.id);
   const counts = await getEventCounts(eventIds);
+  const t = await getTranslations("home");
 
   if (events.length === 0) {
+    const emptyMessage =
+      lifecycle === "happening"
+        ? t("noHappening")
+        : lifecycle === "past"
+          ? t("noPast")
+          : t("noUpcoming");
+
     return (
-      <div className="h-[100dvh] flex items-center justify-center bg-black text-white">
-        <div className="text-center px-8">
-          <p className="text-lg mb-2">No upcoming events yet</p>
-          <p className="text-white/60 text-sm">
-            Be the first to create an event in Da Lat!
-          </p>
+      <div className="h-[100dvh] flex flex-col bg-black text-white">
+        {/* Floating tabs */}
+        <div className="absolute top-14 left-0 right-0 z-40 px-3">
+          <FloatingTabs activeTab={lifecycle} />
+        </div>
+
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center px-8">
+            <p className="text-lg mb-2">{emptyMessage}</p>
+            {lifecycle === "upcoming" && (
+              <p className="text-white/60 text-sm">
+                Be the first to create an event in Da Lat!
+              </p>
+            )}
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="h-[100dvh] overflow-y-auto snap-y snap-mandatory overscroll-contain scrollbar-hide">
-      {events.map((event) => (
-        <EventCardImmersive
-          key={event.id}
-          event={event}
-          counts={counts[event.id]}
-        />
-      ))}
+    <div className="h-[100dvh] relative">
+      {/* Floating tabs below the header */}
+      <div className="absolute top-14 left-0 right-0 z-40 px-3">
+        <FloatingTabs activeTab={lifecycle} />
+      </div>
+
+      {/* Scrollable event cards */}
+      <div className="h-[100dvh] overflow-y-auto snap-y snap-mandatory overscroll-contain scrollbar-hide">
+        {events.map((event) => (
+          <EventCardImmersive
+            key={event.id}
+            event={event}
+            counts={counts[event.id]}
+          />
+        ))}
+      </div>
     </div>
   );
 }

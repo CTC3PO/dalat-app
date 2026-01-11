@@ -1,0 +1,100 @@
+"use client";
+
+import { useRouter, useSearchParams } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { Calendar, Radio, History } from "lucide-react";
+
+export type EventLifecycle = "upcoming" | "happening" | "past";
+
+interface EventFeedTabsProps {
+  activeTab: EventLifecycle;
+  onTabChange?: (tab: EventLifecycle) => void;
+  counts?: { upcoming: number; happening: number; past: number };
+  variant?: "default" | "floating";
+  labels?: { upcoming: string; happening: string; past: string };
+  useUrlNavigation?: boolean;
+}
+
+const tabs: { id: EventLifecycle; icon: typeof Calendar; defaultLabel: string }[] = [
+  { id: "upcoming", icon: Calendar, defaultLabel: "Upcoming" },
+  { id: "happening", icon: Radio, defaultLabel: "Now" },
+  { id: "past", icon: History, defaultLabel: "Past" },
+];
+
+export function EventFeedTabs({
+  activeTab,
+  onTabChange,
+  counts,
+  variant = "default",
+  labels,
+  useUrlNavigation = false,
+}: EventFeedTabsProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const isFloating = variant === "floating";
+
+  const handleTabChange = (tab: EventLifecycle) => {
+    if (useUrlNavigation) {
+      const params = new URLSearchParams(searchParams.toString());
+      if (tab === "upcoming") {
+        params.delete("tab");
+      } else {
+        params.set("tab", tab);
+      }
+      const query = params.toString();
+      router.push(query ? `?${query}` : "/", { scroll: false });
+    }
+    onTabChange?.(tab);
+  };
+
+  return (
+    <div
+      className={cn(
+        "grid w-full grid-cols-3 gap-1 rounded-lg p-1",
+        isFloating
+          ? "bg-black/40 backdrop-blur-md"
+          : "bg-muted"
+      )}
+    >
+      {tabs.map((tab) => {
+        const Icon = tab.icon;
+        const isActive = activeTab === tab.id;
+        const count = counts?.[tab.id];
+        const label = labels?.[tab.id] ?? tab.defaultLabel;
+
+        return (
+          <button
+            key={tab.id}
+            onClick={() => handleTabChange(tab.id)}
+            className={cn(
+              "flex items-center justify-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-all",
+              "active:scale-95",
+              isFloating
+                ? isActive
+                  ? "bg-white/20 text-white shadow-sm"
+                  : "text-white/70 hover:text-white"
+                : isActive
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <Icon className={cn("h-4 w-4", tab.id === "happening" && isActive && "animate-pulse")} />
+            <span>{label}</span>
+            {count !== undefined && count > 0 && (
+              <span
+                className={cn(
+                  "ml-0.5 text-xs",
+                  isFloating
+                    ? "text-white/50"
+                    : "text-muted-foreground"
+                )}
+              >
+                ({count})
+              </span>
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
+}

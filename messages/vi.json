@@ -17,11 +17,19 @@
     "signOut": "Đăng xuất"
   },
   "home": {
-    "title": "Sự kiện sắp tới",
+    "title": "Sự kiện tại Đà Lạt",
     "subtitle": "Khám phá những gì đang diễn ra ở Đà Lạt",
-    "noEvents": "Chưa có sự kiện nào.",
+    "noEvents": "Không có sự kiện nào.",
+    "noUpcoming": "Chưa có sự kiện sắp tới.",
+    "noHappening": "Không có sự kiện nào đang diễn ra.",
+    "noPast": "Chưa có sự kiện nào đã qua.",
     "createFirst": "Tạo sự kiện đầu tiên",
-    "footer": "Được tạo với tình yêu dành cho Đà Lạt, Việt Nam"
+    "footer": "Được tạo với tình yêu dành cho Đà Lạt, Việt Nam",
+    "tabs": {
+      "upcoming": "Sắp tới",
+      "happening": "Đang diễn ra",
+      "past": "Đã qua"
+    }
   },
   "auth": {
     "welcomeTitle": "Chào mừng đến với dalat.app",
@@ -50,7 +58,11 @@
     "organizedBy": "Được tổ chức bởi",
     "moreFrom": "Thêm từ {organizer}",
     "viewAllEvents": "Xem tất cả sự kiện",
-    "notFound": "Không tìm thấy sự kiện"
+    "notFound": "Không tìm thấy sự kiện",
+    "lifecycle": {
+      "live": "Trực tiếp",
+      "ended": "Đã kết thúc"
+    }
   },
   "rsvp": {
     "imGoing": "Tôi sẽ đi",

@@ -17,11 +17,19 @@
     "signOut": "Sign out"
   },
   "home": {
-    "title": "Upcoming Events",
+    "title": "Events in Da Lat",
     "subtitle": "Discover what's happening in Da Lat",
-    "noEvents": "No upcoming events yet.",
+    "noEvents": "No events to show.",
+    "noUpcoming": "No upcoming events yet.",
+    "noHappening": "No events happening right now.",
+    "noPast": "No past events yet.",
     "createFirst": "Create the first event",
-    "footer": "Made with love for Da Lat, Vietnam"
+    "footer": "Made with love for Da Lat, Vietnam",
+    "tabs": {
+      "upcoming": "Upcoming",
+      "happening": "Now",
+      "past": "Past"
+    }
   },
   "auth": {
     "welcomeTitle": "Welcome to dalat.app",
@@ -50,7 +58,11 @@
     "organizedBy": "Organized by",
     "moreFrom": "More from {organizer}",
     "viewAllEvents": "View all events",
-    "notFound": "Event not found"
+    "notFound": "Event not found",
+    "lifecycle": {
+      "live": "Live",
+      "ended": "Ended"
+    }
   },
   "rsvp": {
     "imGoing": "I'm going",

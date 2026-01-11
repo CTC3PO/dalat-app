@@ -17,11 +17,19 @@
     "signOut": "Déconnexion"
   },
   "home": {
-    "title": "Événements à venir",
+    "title": "Événements à Da Lat",
     "subtitle": "Découvrez ce qui se passe à Da Lat",
-    "noEvents": "Pas encore d'événements.",
+    "noEvents": "Aucun événement à afficher.",
+    "noUpcoming": "Pas encore d'événements à venir.",
+    "noHappening": "Aucun événement en cours.",
+    "noPast": "Pas encore d'événements passés.",
     "createFirst": "Créer le premier événement",
-    "footer": "Fait avec amour pour Đà Lạt, Vietnam"
+    "footer": "Fait avec amour pour Đà Lạt, Vietnam",
+    "tabs": {
+      "upcoming": "À venir",
+      "happening": "En cours",
+      "past": "Passés"
+    }
   },
   "auth": {
     "welcomeTitle": "Bienvenue sur dalat.app",
@@ -50,7 +58,11 @@
     "organizedBy": "Organisé par",
     "moreFrom": "Plus de {organizer}",
     "viewAllEvents": "Voir tous les événements",
-    "notFound": "Événement non trouvé"
+    "notFound": "Événement non trouvé",
+    "lifecycle": {
+      "live": "En direct",
+      "ended": "Terminé"
+    }
   },
   "rsvp": {
     "imGoing": "Je participe",

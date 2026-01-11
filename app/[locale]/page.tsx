@@ -6,19 +6,27 @@ import { createClient } from "@/lib/supabase/server";
 import { AuthButton } from "@/components/auth-button";
 import { EventCard } from "@/components/events/event-card";
 import { EventFeedImmersive } from "@/components/events/event-feed-immersive";
+import { EventFeedTabs, type EventLifecycle } from "@/components/events/event-feed-tabs";
 import { Button } from "@/components/ui/button";
 import type { Event, EventCounts } from "@/lib/types";
 
-async function getEvents() {
+type PageProps = {
+  searchParams: Promise<{ tab?: string }>;
+};
+
+function parseLifecycle(tab: string | undefined): EventLifecycle {
+  if (tab === "happening" || tab === "past") return tab;
+  return "upcoming";
+}
+
+async function getEventsByLifecycle(lifecycle: EventLifecycle) {
   const supabase = await createClient();
 
   const { data: events, error } = await supabase
-    .from("events")
-    .select("*")
-    .eq("status", "published")
-    .gte("starts_at", new Date().toISOString())
-    .order("starts_at", { ascending: true })
-    .limit(20);
+    .rpc("get_events_by_lifecycle", {
+      p_lifecycle: lifecycle,
+      p_limit: 20,
+    });
 
   if (error) {
     console.error("Error fetching events:", error);
@@ -33,20 +41,18 @@ async function getEventCounts(eventIds: string[]) {
 
   const supabase = await createClient();
 
-  // Single query to get all RSVPs for all events
   const { data: rsvps } = await supabase
     .from("rsvps")
     .select("event_id, status, plus_ones")
     .in("event_id", eventIds);
 
-  // Compute counts in JS (much faster than N RPC calls)
   const counts: Record<string, EventCounts> = {};
 
   for (const eventId of eventIds) {
-    const eventRsvps = rsvps?.filter(r => r.event_id === eventId) || [];
-    const goingRsvps = eventRsvps.filter(r => r.status === "going");
-    const waitlistRsvps = eventRsvps.filter(r => r.status === "waitlist");
-    const interestedRsvps = eventRsvps.filter(r => r.status === "interested");
+    const eventRsvps = rsvps?.filter((r) => r.event_id === eventId) || [];
+    const goingRsvps = eventRsvps.filter((r) => r.status === "going");
+    const waitlistRsvps = eventRsvps.filter((r) => r.status === "waitlist");
+    const interestedRsvps = eventRsvps.filter((r) => r.status === "interested");
 
     counts[eventId] = {
       event_id: eventId,
@@ -60,19 +66,28 @@ async function getEventCounts(eventIds: string[]) {
   return counts;
 }
 
-async function EventsFeed() {
-  const events = await getEvents();
+async function EventsFeed({ lifecycle }: { lifecycle: EventLifecycle }) {
+  const events = await getEventsByLifecycle(lifecycle);
   const eventIds = events.map((e) => e.id);
   const counts = await getEventCounts(eventIds);
   const t = await getTranslations("home");
 
   if (events.length === 0) {
+    const emptyMessage =
+      lifecycle === "happening"
+        ? t("noHappening")
+        : lifecycle === "past"
+          ? t("noPast")
+          : t("noUpcoming");
+
     return (
       <div className="text-center py-12 text-muted-foreground">
-        <p className="mb-4">{t("noEvents")}</p>
-        <Link href="/events/new" prefetch={false}>
-          <Button>{t("createFirst")}</Button>
-        </Link>
+        <p className="mb-4">{emptyMessage}</p>
+        {lifecycle === "upcoming" && (
+          <Link href="/events/new" prefetch={false}>
+            <Button>{t("createFirst")}</Button>
+          </Link>
+        )}
       </div>
     );
   }
@@ -86,7 +101,17 @@ async function EventsFeed() {
   );
 }
 
-export default async function Home() {
+function DesktopTabs({ activeTab }: { activeTab: EventLifecycle }) {
+  return (
+    <Suspense fallback={<div className="h-10 bg-muted rounded-lg animate-pulse" />}>
+      <EventFeedTabs activeTab={activeTab} useUrlNavigation />
+    </Suspense>
+  );
+}
+
+export default async function Home({ searchParams }: PageProps) {
+  const params = await searchParams;
+  const activeTab = parseLifecycle(params.tab);
   const t = await getTranslations("home");
   const tNav = await getTranslations("nav");
 
@@ -123,7 +148,7 @@ export default async function Home() {
             </div>
           }
         >
-          <EventFeedImmersive />
+          <EventFeedImmersive lifecycle={activeTab} />
         </Suspense>
       </div>
 
@@ -151,11 +176,14 @@ export default async function Home() {
 
         {/* Main content */}
         <div className="flex-1 container max-w-4xl mx-auto px-4 py-8">
-          <div className="mb-8">
+          <div className="mb-6">
             <h1 className="text-2xl font-bold mb-2">{t("title")}</h1>
-            <p className="text-muted-foreground">
-              {t("subtitle")}
-            </p>
+            <p className="text-muted-foreground">{t("subtitle")}</p>
+          </div>
+
+          {/* Tabs */}
+          <div className="mb-6">
+            <DesktopTabs activeTab={activeTab} />
           </div>
 
           <Suspense
@@ -170,7 +198,7 @@ export default async function Home() {
               </div>
             }
           >
-            <EventsFeed />
+            <EventsFeed lifecycle={activeTab} />
           </Suspense>
         </div>
 
