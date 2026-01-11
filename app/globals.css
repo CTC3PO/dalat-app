@@ -71,6 +71,12 @@ a[href="https://novu.co"] {
   display: none !important;
 }
 
+/* Novu bell icon visibility fix */
+[class*="nv-bell"] svg,
+[class*="nv-bell"] svg path {
+  fill: hsl(var(--foreground)) !important;
+}
+
 /* Scrollbar hide utility for immersive scroll-snap */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
