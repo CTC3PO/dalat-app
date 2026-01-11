@@ -1,70 +1,30 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
-import { useEffect, useState, useTransition } from "react";
 import { Link } from "@/lib/i18n/routing";
 import { useTranslations } from "next-intl";
-import { LogOut, Moon, Sun, Laptop, User, Globe, Settings, ExternalLink, Check, Shield } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
+import { User, Settings, ExternalLink, Shield } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LOCALE_NAMES, LOCALE_FLAGS, SUPPORTED_LOCALES } from "@/lib/locale";
-import type { Locale, UserRole } from "@/lib/types";
+import type { UserRole } from "@/lib/types";
 
 interface UserMenuProps {
   avatarUrl: string | null;
   displayName: string | null;
   username: string | null;
-  userId: string;
-  currentLocale: Locale;
   role: UserRole;
 }
 
 const ADMIN_ROLES: UserRole[] = ["admin", "moderator", "organizer_verified", "contributor"];
 
-export function UserMenu({ avatarUrl, displayName, username, userId, currentLocale, role }: UserMenuProps) {
+export function UserMenu({ avatarUrl, displayName, username, role }: UserMenuProps) {
   const hasAdminAccess = ADMIN_ROLES.includes(role);
-  const router = useRouter();
-  const { theme, setTheme } = useTheme();
   const t = useTranslations("userMenu");
   const tCommon = useTranslations("common");
-  const [mounted, setMounted] = useState(false);
-  const [locale, setLocale] = useState<Locale>(currentLocale);
-  const [isPending, startTransition] = useTransition();
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const logout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/");
-    router.refresh();
-  };
-
-  const changeLocale = (newLocale: Locale) => {
-    setLocale(newLocale);
-    const supabase = createClient();
-    startTransition(async () => {
-      await supabase
-        .from("profiles")
-        .update({ locale: newLocale })
-        .eq("id", userId);
-      router.refresh();
-    });
-  };
-
-  const ThemeIcon = theme === "light" ? Sun : theme === "dark" ? Moon : Laptop;
 
   return (
     <DropdownMenu>
@@ -138,73 +98,6 @@ export function UserMenu({ avatarUrl, displayName, username, userId, currentLoca
             </DropdownMenuItem>
           </>
         )}
-
-        <DropdownMenuSeparator />
-
-        {/* Theme submenu */}
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger>
-            {mounted && <ThemeIcon className="w-4 h-4 mr-2" />}
-            {t("theme")}
-            {mounted && (
-              <span className="ml-auto text-xs text-muted-foreground">
-                {theme === "light" ? t("themeLight") : theme === "dark" ? t("themeDark") : t("themeSystem")}
-              </span>
-            )}
-          </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent>
-            <DropdownMenuItem onClick={() => setTheme("light")} className="justify-between">
-              <span className="flex items-center">
-                <Sun className="w-4 h-4 mr-2" />
-                {t("themeLight")}
-              </span>
-              {mounted && theme === "light" && <Check className="w-4 h-4 text-primary" />}
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setTheme("dark")} className="justify-between">
-              <span className="flex items-center">
-                <Moon className="w-4 h-4 mr-2" />
-                {t("themeDark")}
-              </span>
-              {mounted && theme === "dark" && <Check className="w-4 h-4 text-primary" />}
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setTheme("system")} className="justify-between">
-              <span className="flex items-center">
-                <Laptop className="w-4 h-4 mr-2" />
-                {t("themeSystem")}
-              </span>
-              {mounted && theme === "system" && <Check className="w-4 h-4 text-primary" />}
-            </DropdownMenuItem>
-          </DropdownMenuSubContent>
-        </DropdownMenuSub>
-
-        {/* Language submenu */}
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger disabled={isPending}>
-            <Globe className="w-4 h-4 mr-2" />
-            {t("language")}
-            <span className="ml-auto text-xs">
-              {LOCALE_FLAGS[locale]}
-            </span>
-          </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent>
-            {SUPPORTED_LOCALES.map((l) => (
-              <DropdownMenuItem key={l} onClick={() => changeLocale(l)} className="justify-between">
-                <span className="flex items-center gap-2">
-                  <span>{LOCALE_FLAGS[l]}</span>
-                  {LOCALE_NAMES[l]}
-                </span>
-                {l === locale && <Check className="w-4 h-4 text-primary" />}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuSubContent>
-        </DropdownMenuSub>
-
-        <DropdownMenuSeparator />
-
-        <DropdownMenuItem onClick={logout} className="text-red-500 focus:text-red-500">
-          <LogOut className="w-4 h-4 mr-2" />
-          {t("signOut")}
-        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

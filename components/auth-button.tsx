@@ -5,13 +5,14 @@ import { createClient } from "@/lib/supabase/server";
 import { UserMenu } from "./user-menu";
 import { NotificationInbox } from "./notification-inbox";
 import { generateSubscriberHash } from "@/lib/novu";
-import type { Locale } from "@/lib/types";
 
 export async function AuthButton() {
   const supabase = await createClient();
   const t = await getTranslations("nav");
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     return (
@@ -21,10 +22,10 @@ export async function AuthButton() {
     );
   }
 
-  // Fetch profile for avatar, locale, and role
+  // Fetch profile for avatar and role
   const { data: profile } = await supabase
     .from("profiles")
-    .select("avatar_url, display_name, username, locale, role")
+    .select("avatar_url, display_name, username, role")
     .eq("id", user.id)
     .single();
 
@@ -38,8 +39,6 @@ export async function AuthButton() {
         avatarUrl={profile?.avatar_url || null}
         displayName={profile?.display_name || null}
         username={profile?.username || null}
-        userId={user.id}
-        currentLocale={(profile?.locale as Locale) || "en"}
         role={profile?.role || "user"}
       />
     </div>
