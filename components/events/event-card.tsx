@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { EventDefaultImage } from "@/components/events/event-default-image";
 import { formatInDaLat } from "@/lib/timezone";
 import { isVideoUrl, isDefaultImageUrl } from "@/lib/media-utils";
+import { triggerHaptic } from "@/lib/haptics";
 import type { Event, EventCounts } from "@/lib/types";
 
 interface EventCardProps {
@@ -26,8 +27,12 @@ export function EventCard({ event, counts }: EventCardProps) {
   const imageIsVideo = isVideoUrl(event.image_url);
 
   return (
-    <Link href={`/events/${event.slug}`} prefetch={false} className="block">
-      <Card className="overflow-hidden hover:border-foreground/20 transition-colors">
+    <Link
+      href={`/events/${event.slug}`}
+      className="block touch-manipulation"
+      onClick={() => triggerHaptic("selection")}
+    >
+      <Card className="overflow-hidden hover:border-foreground/20 transition-all duration-150 active:scale-[0.98] active:opacity-90">
         {/* Image area */}
         <div className="w-full aspect-[4/5] relative overflow-hidden group">
           {hasCustomImage ? (

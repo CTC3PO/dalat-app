@@ -6,6 +6,7 @@ import { EventDefaultImage } from "@/components/events/event-default-image";
 import { ImmersiveImage } from "@/components/events/immersive-image";
 import { formatInDaLat } from "@/lib/timezone";
 import { isVideoUrl, isDefaultImageUrl } from "@/lib/media-utils";
+import { triggerHaptic } from "@/lib/haptics";
 import type { Event, EventCounts } from "@/lib/types";
 
 interface EventCardImmersiveProps {
@@ -29,8 +30,8 @@ export function EventCardImmersive({ event, counts }: EventCardImmersiveProps) {
   return (
     <Link
       href={`/events/${event.slug}`}
-      prefetch={false}
-      className="block h-[100dvh] w-full relative snap-start bg-black"
+      className="block h-[100dvh] w-full relative snap-start bg-black touch-manipulation active:opacity-95 transition-opacity duration-150"
+      onClick={() => triggerHaptic("selection")}
     >
       <article className="h-full w-full relative flex flex-col">
         {/* Media area - fills most of viewport */}
