@@ -170,7 +170,62 @@
   "calendar": {
     "addToCalendar": "Add to calendar",
     "googleCalendar": "Google Calendar",
-    "appleOutlook": "Apple / Outlook (.ics)"
+    "appleOutlook": "Apple / Outlook (.ics)",
+    "addEntireSeries": "Add entire series"
+  },
+  "series": {
+    "recurringSeries": "Recurring Series",
+    "upcomingDates": "Upcoming Dates",
+    "noUpcomingDates": "No upcoming dates scheduled",
+    "moreDates": "More dates coming soon...",
+    "organizedBy": "Organized by",
+    "createdBy": "Created by",
+    "viewProfile": "View profile",
+    "subscribers": "{count, plural, one {# subscriber} other {# subscribers}}",
+    "editSeries": "Edit Series",
+    "rsvpModal": {
+      "title": "You're going!",
+      "description": "This event is part of a recurring series ({pattern}).",
+      "justThisEvent": "Just this event",
+      "justThisEventDesc": "Only RSVP for {date}",
+      "allFutureEvents": "RSVP to all future events",
+      "allFutureEventsDesc": "Auto-RSVP when new dates are added",
+      "addToCalendar": "Add series to calendar",
+      "addToCalendarDesc": "Download and subscribe in your calendar app",
+      "done": "Done"
+    }
+  },
+  "recurrence": {
+    "repeat": "Repeat",
+    "doesNotRepeat": "Does not repeat",
+    "custom": "Custom...",
+    "every": "Every",
+    "on": "On",
+    "ends": "Ends",
+    "never": "Never",
+    "after": "After...",
+    "onDate": "On date...",
+    "occurrences": "occurrences",
+    "hideOptions": "Hide options",
+    "customizeRecurrence": "Customize recurrence",
+    "selectDateFirst": "Select a date to enable recurrence",
+    "frequency": {
+      "day": "day",
+      "days": "days",
+      "week": "week",
+      "weeks": "weeks",
+      "month": "month",
+      "months": "months"
+    },
+    "weekdays": {
+      "SU": "S",
+      "MO": "M",
+      "TU": "T",
+      "WE": "W",
+      "TH": "T",
+      "FR": "F",
+      "SA": "S"
+    }
   },
   "attendees": {
     "whosGoing": "Who's going ({count})",

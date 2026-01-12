@@ -170,7 +170,62 @@
   "calendar": {
     "addToCalendar": "Ajouter au calendrier",
     "googleCalendar": "Google Agenda",
-    "appleOutlook": "Apple / Outlook (.ics)"
+    "appleOutlook": "Apple / Outlook (.ics)",
+    "addEntireSeries": "Ajouter toute la série"
+  },
+  "series": {
+    "recurringSeries": "Série récurrente",
+    "upcomingDates": "Prochaines dates",
+    "noUpcomingDates": "Aucune date prévue",
+    "moreDates": "D'autres dates à venir...",
+    "organizedBy": "Organisé par",
+    "createdBy": "Créé par",
+    "viewProfile": "Voir le profil",
+    "subscribers": "{count, plural, one {# abonné} other {# abonnés}}",
+    "editSeries": "Modifier la série",
+    "rsvpModal": {
+      "title": "Vous participez !",
+      "description": "Cet événement fait partie d'une série récurrente ({pattern}).",
+      "justThisEvent": "Seulement cet événement",
+      "justThisEventDesc": "S'inscrire uniquement pour le {date}",
+      "allFutureEvents": "S'inscrire à tous les événements futurs",
+      "allFutureEventsDesc": "Inscription automatique aux nouvelles dates",
+      "addToCalendar": "Ajouter la série au calendrier",
+      "addToCalendarDesc": "Télécharger et s'abonner dans votre application calendrier",
+      "done": "Terminé"
+    }
+  },
+  "recurrence": {
+    "repeat": "Répéter",
+    "doesNotRepeat": "Ne se répète pas",
+    "custom": "Personnalisé...",
+    "every": "Tous les",
+    "on": "Le",
+    "ends": "Fin",
+    "never": "Jamais",
+    "after": "Après...",
+    "onDate": "À la date...",
+    "occurrences": "occurrences",
+    "hideOptions": "Masquer les options",
+    "customizeRecurrence": "Personnaliser la récurrence",
+    "selectDateFirst": "Sélectionnez une date pour activer la récurrence",
+    "frequency": {
+      "day": "jour",
+      "days": "jours",
+      "week": "semaine",
+      "weeks": "semaines",
+      "month": "mois",
+      "months": "mois"
+    },
+    "weekdays": {
+      "SU": "D",
+      "MO": "L",
+      "TU": "M",
+      "WE": "M",
+      "TH": "J",
+      "FR": "V",
+      "SA": "S"
+    }
   },
   "attendees": {
     "whosGoing": "Qui participe ({count})",

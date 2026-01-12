@@ -1,0 +1,258 @@
+import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { addMonths, format, parseISO } from "date-fns";
+import { fromZonedTime } from "date-fns-tz";
+import { generateSeriesInstances, isValidRRule } from "@/lib/recurrence";
+
+interface CreateSeriesRequest {
+  title: string;
+  description?: string;
+  image_url?: string;
+  location_name?: string;
+  address?: string;
+  google_maps_url?: string;
+  external_chat_url?: string;
+  capacity?: number;
+  tribe_id?: string;
+  organizer_id?: string;
+  rrule: string;
+  starts_at_time: string; // "19:00" or "19:00:00"
+  duration_minutes?: number;
+  first_occurrence: string; // "2025-01-14"
+  rrule_until?: string; // ISO date
+  rrule_count?: number;
+}
+
+const DALAT_TIMEZONE = "Asia/Ho_Chi_Minh";
+const DEFAULT_DURATION_MINUTES = 120;
+const GENERATE_MONTHS_AHEAD = 6;
+
+function sanitizeSlug(input: string): string {
+  return input
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 50);
+}
+
+function generateSeriesSlug(title: string): string {
+  const base = sanitizeSlug(title);
+  const suffix = Math.random().toString(36).slice(2, 6);
+  return `${base}-${suffix}`;
+}
+
+/**
+ * POST /api/series - Create a new recurring event series
+ */
+export async function POST(request: Request) {
+  const supabase = await createClient();
+
+  // Auth check
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
+  const body: CreateSeriesRequest = await request.json();
+
+  // Validation
+  if (!body.title?.trim()) {
+    return NextResponse.json({ error: "Title is required" }, { status: 400 });
+  }
+
+  if (!body.rrule || !isValidRRule(body.rrule)) {
+    return NextResponse.json({ error: "Invalid recurrence rule" }, { status: 400 });
+  }
+
+  if (!body.starts_at_time) {
+    return NextResponse.json({ error: "Start time is required" }, { status: 400 });
+  }
+
+  if (!body.first_occurrence) {
+    return NextResponse.json({ error: "First occurrence date is required" }, { status: 400 });
+  }
+
+  // Normalize time to HH:MM:SS format
+  const timeparts = body.starts_at_time.split(":");
+  const normalizedTime =
+    timeparts.length === 2
+      ? `${timeparts[0]}:${timeparts[1]}:00`
+      : body.starts_at_time;
+
+  const seriesSlug = generateSeriesSlug(body.title);
+  const durationMinutes = body.duration_minutes || DEFAULT_DURATION_MINUTES;
+
+  try {
+    // Create the series
+    const { data: series, error: seriesError } = await supabase
+      .from("event_series")
+      .insert({
+        slug: seriesSlug,
+        title: body.title.trim(),
+        description: body.description?.trim() || null,
+        image_url: body.image_url || null,
+        location_name: body.location_name?.trim() || null,
+        address: body.address?.trim() || null,
+        google_maps_url: body.google_maps_url || null,
+        external_chat_url: body.external_chat_url || null,
+        timezone: DALAT_TIMEZONE,
+        capacity: body.capacity || null,
+        tribe_id: body.tribe_id || null,
+        organizer_id: body.organizer_id || null,
+        created_by: user.id,
+        rrule: body.rrule,
+        starts_at_time: normalizedTime,
+        duration_minutes: durationMinutes,
+        first_occurrence: body.first_occurrence,
+        rrule_until: body.rrule_until || null,
+        rrule_count: body.rrule_count || null,
+        status: "active",
+      })
+      .select()
+      .single();
+
+    if (seriesError) {
+      console.error("Series creation error:", seriesError);
+      return NextResponse.json(
+        { error: "Failed to create series: " + seriesError.message },
+        { status: 500 }
+      );
+    }
+
+    // Generate instances for the next N months
+    const generateFrom = new Date(body.first_occurrence);
+    const generateUntil = addMonths(new Date(), GENERATE_MONTHS_AHEAD);
+
+    const occurrenceDates = generateSeriesInstances(
+      {
+        rrule: body.rrule,
+        first_occurrence: body.first_occurrence,
+        rrule_until: body.rrule_until || null,
+        rrule_count: body.rrule_count || null,
+      },
+      generateFrom,
+      generateUntil
+    );
+
+    // Create event instances
+    const eventInserts = occurrenceDates.map((date) => {
+      const dateStr = format(date, "yyyy-MM-dd");
+      const instanceSlug = `${seriesSlug}-${format(date, "yyyyMMdd")}`;
+
+      // Combine date and time in Da Lat timezone, then convert to UTC
+      const localDateTime = `${dateStr}T${normalizedTime}`;
+      const startsAt = fromZonedTime(localDateTime, DALAT_TIMEZONE);
+      const endsAt = new Date(startsAt.getTime() + durationMinutes * 60 * 1000);
+
+      return {
+        slug: instanceSlug,
+        series_id: series.id,
+        series_instance_date: dateStr,
+        title: body.title.trim(),
+        description: body.description?.trim() || null,
+        image_url: body.image_url || null,
+        location_name: body.location_name?.trim() || null,
+        address: body.address?.trim() || null,
+        google_maps_url: body.google_maps_url || null,
+        external_chat_url: body.external_chat_url || null,
+        timezone: DALAT_TIMEZONE,
+        capacity: body.capacity || null,
+        tribe_id: body.tribe_id || null,
+        organizer_id: body.organizer_id || null,
+        created_by: user.id,
+        starts_at: startsAt.toISOString(),
+        ends_at: endsAt.toISOString(),
+        status: "published" as const,
+        is_exception: false,
+      };
+    });
+
+    if (eventInserts.length > 0) {
+      const { error: eventsError } = await supabase
+        .from("events")
+        .insert(eventInserts);
+
+      if (eventsError) {
+        console.error("Events creation error:", eventsError);
+        // Series was created but events failed - clean up
+        await supabase.from("event_series").delete().eq("id", series.id);
+        return NextResponse.json(
+          { error: "Failed to create event instances: " + eventsError.message },
+          { status: 500 }
+        );
+      }
+
+      // Update the series with generation watermark
+      await supabase
+        .from("event_series")
+        .update({ instances_generated_until: generateUntil.toISOString() })
+        .eq("id", series.id);
+    }
+
+    return NextResponse.json({
+      success: true,
+      series,
+      instances_created: eventInserts.length,
+    });
+  } catch (error) {
+    console.error("Create series error:", error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Failed to create series" },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * GET /api/series - List series for the current user
+ */
+export async function GET(request: Request) {
+  const supabase = await createClient();
+  const { searchParams } = new URL(request.url);
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Get series (either all active or user's own)
+  const query = supabase
+    .from("event_series")
+    .select(
+      `
+      *,
+      profiles:created_by (display_name, avatar_url),
+      organizers:organizer_id (name, logo_url)
+    `
+    )
+    .order("created_at", { ascending: false });
+
+  // If not authenticated, only show active series
+  if (!user) {
+    query.eq("status", "active");
+  } else {
+    // Show active series OR user's own series
+    const showOwn = searchParams.get("own") === "true";
+    if (showOwn) {
+      query.eq("created_by", user.id);
+    } else {
+      query.eq("status", "active");
+    }
+  }
+
+  const limit = parseInt(searchParams.get("limit") || "20", 10);
+  query.limit(limit);
+
+  const { data: series, error } = await query;
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ series });
+}

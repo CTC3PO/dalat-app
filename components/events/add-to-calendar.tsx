@@ -20,6 +20,8 @@ interface AddToCalendarProps {
   startsAt: string;
   endsAt?: string | null;
   url: string;
+  // For recurring events: provide series slug to show "Add entire series" option
+  seriesSlug?: string | null;
 }
 
 // Format date for Google Calendar (YYYYMMDDTHHmmss)
@@ -155,7 +157,7 @@ export function AddToCalendar(props: AddToCalendarProps) {
           {t("addToCalendar")}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="center" className="w-48">
+      <DropdownMenuContent align="center" className="w-56">
         <DropdownMenuItem asChild>
           <a href={googleUrl} target="_blank" rel="noopener noreferrer">
             {t("googleCalendar")}
@@ -164,6 +166,20 @@ export function AddToCalendar(props: AddToCalendarProps) {
         <DropdownMenuItem onClick={() => downloadICS(props)}>
           {t("appleOutlook")}
         </DropdownMenuItem>
+        {props.seriesSlug && (
+          <>
+            <div className="h-px bg-border my-1" />
+            <DropdownMenuItem asChild>
+              <a
+                href={`/api/series/${props.seriesSlug}/calendar.ics`}
+                download
+                className="text-primary"
+              >
+                {t("addEntireSeries")}
+              </a>
+            </DropdownMenuItem>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

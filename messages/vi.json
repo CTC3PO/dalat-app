@@ -170,7 +170,62 @@
   "calendar": {
     "addToCalendar": "Thêm vào lịch",
     "googleCalendar": "Google Calendar",
-    "appleOutlook": "Apple / Outlook (.ics)"
+    "appleOutlook": "Apple / Outlook (.ics)",
+    "addEntireSeries": "Thêm toàn bộ chuỗi"
+  },
+  "series": {
+    "recurringSeries": "Chuỗi sự kiện lặp lại",
+    "upcomingDates": "Các ngày sắp tới",
+    "noUpcomingDates": "Chưa có ngày nào được lên lịch",
+    "moreDates": "Các ngày khác sắp tới...",
+    "organizedBy": "Được tổ chức bởi",
+    "createdBy": "Được tạo bởi",
+    "viewProfile": "Xem hồ sơ",
+    "subscribers": "{count, plural, one {# người theo dõi} other {# người theo dõi}}",
+    "editSeries": "Chỉnh sửa chuỗi",
+    "rsvpModal": {
+      "title": "Bạn sẽ tham gia!",
+      "description": "Sự kiện này là một phần của chuỗi lặp lại ({pattern}).",
+      "justThisEvent": "Chỉ sự kiện này",
+      "justThisEventDesc": "Chỉ đăng ký cho ngày {date}",
+      "allFutureEvents": "Đăng ký tất cả sự kiện trong tương lai",
+      "allFutureEventsDesc": "Tự động đăng ký khi có ngày mới",
+      "addToCalendar": "Thêm chuỗi vào lịch",
+      "addToCalendarDesc": "Tải xuống và đăng ký trong ứng dụng lịch",
+      "done": "Xong"
+    }
+  },
+  "recurrence": {
+    "repeat": "Lặp lại",
+    "doesNotRepeat": "Không lặp lại",
+    "custom": "Tùy chỉnh...",
+    "every": "Mỗi",
+    "on": "Vào",
+    "ends": "Kết thúc",
+    "never": "Không bao giờ",
+    "after": "Sau...",
+    "onDate": "Vào ngày...",
+    "occurrences": "lần",
+    "hideOptions": "Ẩn tùy chọn",
+    "customizeRecurrence": "Tùy chỉnh lặp lại",
+    "selectDateFirst": "Chọn ngày để bật tính năng lặp lại",
+    "frequency": {
+      "day": "ngày",
+      "days": "ngày",
+      "week": "tuần",
+      "weeks": "tuần",
+      "month": "tháng",
+      "months": "tháng"
+    },
+    "weekdays": {
+      "SU": "CN",
+      "MO": "T2",
+      "TU": "T3",
+      "WE": "T4",
+      "TH": "T5",
+      "FR": "T6",
+      "SA": "T7"
+    }
   },
   "attendees": {
     "whosGoing": "Ai sẽ đi ({count})",
