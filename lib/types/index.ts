@@ -100,10 +100,16 @@ export interface Event {
   created_by: string;
   created_at: string;
   updated_at: string;
+  // Series fields (for recurring event instances)
+  series_id: string | null;
+  series_instance_date: string | null;
+  is_exception: boolean;
+  exception_type: "modified" | "cancelled" | "rescheduled" | null;
   // Joined data
   profiles?: Profile;
   tribes?: Tribe;
   organizers?: Organizer;
+  event_series?: EventSeries;
 }
 
 export interface Rsvp {
@@ -450,4 +456,87 @@ export interface InvitationCounts {
   going: number;
   not_going: number;
   maybe: number;
+}
+
+// ============================================
+// Recurring Events Types
+// ============================================
+
+export type RecurrenceFrequency = 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY';
+export type SeriesStatus = 'active' | 'paused' | 'cancelled';
+export type ExceptionType = 'modified' | 'cancelled' | 'rescheduled';
+
+export interface EventSeries {
+  id: string;
+  slug: string;
+  title: string;
+  description: string | null;
+  image_url: string | null;
+  location_name: string | null;
+  address: string | null;
+  google_maps_url: string | null;
+  external_chat_url: string | null;
+  timezone: string;
+  capacity: number | null;
+  tribe_id: string | null;
+  organizer_id: string | null;
+  created_by: string;
+  rrule: string;
+  starts_at_time: string;
+  duration_minutes: number;
+  first_occurrence: string;
+  rrule_until: string | null;
+  rrule_count: number | null;
+  status: SeriesStatus;
+  instances_generated_until: string | null;
+  created_at: string;
+  updated_at: string;
+  // Joined data
+  profiles?: Profile;
+  organizers?: Organizer;
+  tribes?: Tribe;
+}
+
+export interface SeriesException {
+  id: string;
+  series_id: string;
+  original_date: string;
+  exception_type: ExceptionType;
+  new_event_id: string | null;
+  reason: string | null;
+  created_at: string;
+  created_by: string;
+}
+
+export interface SeriesRsvp {
+  series_id: string;
+  user_id: string;
+  auto_rsvp: boolean;
+  created_at: string;
+  // Joined data
+  profiles?: Profile;
+}
+
+// Recurrence form data for the UI picker
+export interface RecurrenceFormData {
+  isRecurring: boolean;
+  frequency: RecurrenceFrequency;
+  interval: number;
+  weekDays: string[];  // ["MO", "TU", "WE", "TH", "FR", "SA", "SU"]
+  monthDay: number | null;  // 1-31 for specific day
+  monthWeekDay: {
+    week: number;  // 1-5 (-1 for last)
+    day: string;   // "MO", "TU", etc.
+  } | null;
+  endType: 'never' | 'count' | 'date';
+  endCount?: number;
+  endDate?: string;  // ISO date string
+}
+
+// Preset recurrence patterns for quick selection
+export interface RecurrencePreset {
+  id: string;
+  label: string;
+  rrule: string;
+  description?: string;
 }

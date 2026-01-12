@@ -126,7 +126,7 @@ export function parseRRule(rrule: string): RecurrenceFormData {
     }
   }
 
-  const monthDay = parts.BYMONTHDAY ? parseInt(parts.BYMONTHDAY, 10) : undefined;
+  const monthDay = parts.BYMONTHDAY ? parseInt(parts.BYMONTHDAY, 10) : null;
 
   return {
     isRecurring: true,
@@ -134,7 +134,7 @@ export function parseRRule(rrule: string): RecurrenceFormData {
     interval,
     weekDays,
     monthDay,
-    monthWeekDay,
+    monthWeekDay: monthWeekDay || null,
     endType: parts.COUNT ? "count" : "never",
     endCount: parts.COUNT ? parseInt(parts.COUNT, 10) : undefined,
   };
@@ -149,6 +149,8 @@ export function getDefaultRecurrenceData(): RecurrenceFormData {
     frequency: "WEEKLY",
     interval: 1,
     weekDays: [],
+    monthDay: null,
+    monthWeekDay: null,
     endType: "never",
   };
 }

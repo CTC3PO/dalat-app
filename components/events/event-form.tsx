@@ -9,9 +9,11 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { PlaceAutocomplete } from "@/components/events/place-autocomplete";
 import { EventMediaUpload } from "@/components/events/event-media-upload";
+import { RecurrencePicker } from "@/components/events/recurrence-picker";
 import { toUTCFromDaLat, getDateTimeInDaLat } from "@/lib/timezone";
 import { canEditSlug } from "@/lib/config";
-import type { Event } from "@/lib/types";
+import { getDefaultRecurrenceData, buildRRule } from "@/lib/recurrence";
+import type { Event, RecurrenceFormData } from "@/lib/types";
 
 interface EventFormProps {
   userId: string;
@@ -68,6 +70,12 @@ export function EventForm({ userId, event }: EventFormProps) {
   const [slug, setSlug] = useState(event?.slug ?? "");
   const [slugStatus, setSlugStatus] = useState<SlugStatus>("idle");
   const [slugTouched, setSlugTouched] = useState(false);
+
+  // Recurrence state (only for new events)
+  const [recurrence, setRecurrence] = useState<RecurrenceFormData>(getDefaultRecurrenceData());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(
+    event?.starts_at ? new Date(event.starts_at) : null
+  );
 
   // Check slug availability with debounce
   useEffect(() => {
@@ -127,6 +135,16 @@ export function EventForm({ userId, event }: EventFormProps) {
 
   const handleSlugBlur = () => {
     setSlug(finalizeSlug(slug));
+  };
+
+  // Track selected date for recurrence picker
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const dateStr = e.target.value;
+    if (dateStr) {
+      setSelectedDate(new Date(dateStr + "T12:00:00"));
+    } else {
+      setSelectedDate(null);
+    }
   };
 
   // Parse existing event date/time in Da Lat timezone
@@ -209,37 +227,73 @@ export function EventForm({ userId, event }: EventFormProps) {
         router.push(`/events/${finalSlug}`);
         router.refresh();
       } else {
-        // Create new event
-        // Use custom slug if provided and valid, otherwise auto-generate
+        // Create new event or series
         const cleanSlug = finalizeSlug(slug);
         const finalSlug = slugEditable && cleanSlug && slugStatus === "available"
           ? cleanSlug
           : generateSlug(title);
 
-        const { data, error: insertError } = await supabase
-          .from("events")
-          .insert({
-            slug: finalSlug,
-            title,
-            description: description || null,
-            starts_at: startsAt,
-            location_name: locationName || null,
-            address: address || null,
-            google_maps_url: googleMapsUrl || null,
-            external_chat_url: externalChatUrl || null,
-            capacity,
-            created_by: userId,
-            status: "published",
-          })
-          .select()
-          .single();
+        // If recurring, create a series via API
+        if (recurrence.isRecurring) {
+          const rrule = buildRRule(recurrence);
 
-        if (insertError) {
-          setError(insertError.message);
-          return;
+          const response = await fetch("/api/series", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              slug: finalSlug,
+              title,
+              description: description || null,
+              location_name: locationName || null,
+              address: address || null,
+              google_maps_url: googleMapsUrl || null,
+              external_chat_url: externalChatUrl || null,
+              capacity,
+              rrule,
+              starts_at_time: time + ":00", // Convert "19:00" to "19:00:00"
+              first_occurrence: date,
+              rrule_until: recurrence.endType === "date" && recurrence.endDate
+                ? new Date(recurrence.endDate).toISOString()
+                : null,
+              rrule_count: recurrence.endType === "count" ? recurrence.endCount : null,
+            }),
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            setError(errorData.error || "Failed to create recurring event");
+            return;
+          }
+
+          const seriesData = await response.json();
+          router.push(`/series/${seriesData.slug}`);
+        } else {
+          // Single event - direct insert
+          const { data, error: insertError } = await supabase
+            .from("events")
+            .insert({
+              slug: finalSlug,
+              title,
+              description: description || null,
+              starts_at: startsAt,
+              location_name: locationName || null,
+              address: address || null,
+              google_maps_url: googleMapsUrl || null,
+              external_chat_url: externalChatUrl || null,
+              capacity,
+              created_by: userId,
+              status: "published",
+            })
+            .select()
+            .single();
+
+          if (insertError) {
+            setError(insertError.message);
+            return;
+          }
+
+          router.push(`/events/${data.slug}`);
         }
-
-        router.push(`/events/${data.slug}`);
       }
     });
   }
@@ -337,6 +391,7 @@ export function EventForm({ userId, event }: EventFormProps) {
                 name="date"
                 type="date"
                 defaultValue={defaults.date}
+                onChange={handleDateChange}
                 required
               />
             </div>
@@ -351,6 +406,15 @@ export function EventForm({ userId, event }: EventFormProps) {
               />
             </div>
           </div>
+
+          {/* Recurrence (only for new events) */}
+          {!isEditing && (
+            <RecurrencePicker
+              selectedDate={selectedDate}
+              value={recurrence}
+              onChange={setRecurrence}
+            />
+          )}
 
           {/* Location (Google Places Autocomplete) */}
           <PlaceAutocomplete
@@ -406,10 +470,14 @@ export function EventForm({ userId, event }: EventFormProps) {
             {isPending
               ? isEditing
                 ? "Saving..."
-                : "Creating..."
+                : recurrence.isRecurring
+                  ? "Creating series..."
+                  : "Creating..."
               : isEditing
                 ? "Save changes"
-                : "Create event"}
+                : recurrence.isRecurring
+                  ? "Create recurring event"
+                  : "Create event"}
           </Button>
         </CardContent>
       </Card>
