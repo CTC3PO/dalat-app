@@ -10,14 +10,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { PlaceAutocomplete } from "@/components/events/place-autocomplete";
 import { EventMediaUpload } from "@/components/events/event-media-upload";
 import { RecurrencePicker } from "@/components/events/recurrence-picker";
+import { SponsorForm } from "@/components/events/sponsor-form";
 import { toUTCFromDaLat, getDateTimeInDaLat } from "@/lib/timezone";
 import { canEditSlug } from "@/lib/config";
 import { getDefaultRecurrenceData, buildRRule } from "@/lib/recurrence";
-import type { Event, RecurrenceFormData } from "@/lib/types";
+import type { Event, RecurrenceFormData, Sponsor, EventSponsor } from "@/lib/types";
 
 interface EventFormProps {
   userId: string;
   event?: Event;
+  initialSponsors?: (EventSponsor & { sponsors: Sponsor })[];
 }
 
 /**
@@ -55,7 +57,7 @@ function suggestSlug(title: string): string {
 
 type SlugStatus = "idle" | "checking" | "available" | "taken" | "invalid";
 
-export function EventForm({ userId, event }: EventFormProps) {
+export function EventForm({ userId, event, initialSponsors = [] }: EventFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -461,6 +463,17 @@ export function EventForm({ userId, event }: EventFormProps) {
               Once full, new RSVPs go to a waitlist
             </p>
           </div>
+
+          {/* Sponsors (only when editing) */}
+          {isEditing && event && (
+            <div className="pt-4 border-t">
+              <SponsorForm
+                eventId={event.id}
+                initialSponsors={initialSponsors}
+                onChange={() => {}}
+              />
+            </div>
+          )}
 
           {error && (
             <p className="text-sm text-red-500">{error}</p>

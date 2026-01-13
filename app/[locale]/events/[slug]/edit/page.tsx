@@ -3,7 +3,7 @@ import { Link } from "@/lib/i18n/routing";
 import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { EventForm } from "@/components/events/event-form";
-import type { Event } from "@/lib/types";
+import type { Event, Sponsor, EventSponsor } from "@/lib/types";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -37,6 +37,15 @@ export default async function EditEventPage({ params }: PageProps) {
     redirect(`/events/${slug}`);
   }
 
+  // Fetch sponsors for this event
+  const { data: eventSponsors } = await supabase
+    .from("event_sponsors")
+    .select("*, sponsors(*)")
+    .eq("event_id", event.id)
+    .order("sort_order");
+
+  const sponsors = (eventSponsors || []) as (EventSponsor & { sponsors: Sponsor })[];
+
   return (
     <main className="min-h-screen">
       {/* Header */}
@@ -54,7 +63,7 @@ export default async function EditEventPage({ params }: PageProps) {
 
       <div className="container max-w-2xl mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold mb-8">Edit Event</h1>
-        <EventForm userId={user.id} event={event as Event} />
+        <EventForm userId={user.id} event={event as Event} initialSponsors={sponsors} />
       </div>
     </main>
   );

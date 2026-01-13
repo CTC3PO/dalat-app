@@ -19,7 +19,8 @@ import { formatInDaLat } from "@/lib/timezone";
 import { MoreFromOrganizer } from "@/components/events/more-from-organizer";
 import { Linkify } from "@/lib/linkify";
 import { MomentsPreview } from "@/components/moments";
-import type { Event, EventCounts, Rsvp, Profile, Organizer, MomentWithProfile, MomentCounts, EventSettings } from "@/lib/types";
+import { SponsorDisplay } from "@/components/events/sponsor-display";
+import type { Event, EventCounts, Rsvp, Profile, Organizer, MomentWithProfile, MomentCounts, EventSettings, Sponsor, EventSponsor } from "@/lib/types";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -256,6 +257,18 @@ async function getEventSettings(eventId: string): Promise<EventSettings | null> 
   return data as EventSettings | null;
 }
 
+async function getEventSponsors(eventId: string): Promise<(EventSponsor & { sponsors: Sponsor })[]> {
+  const supabase = await createClient();
+
+  const { data } = await supabase
+    .from("event_sponsors")
+    .select("*, sponsors(*)")
+    .eq("event_id", eventId)
+    .order("sort_order");
+
+  return (data ?? []) as (EventSponsor & { sponsors: Sponsor })[];
+}
+
 async function canUserPostMoment(eventId: string, userId: string | null, creatorId: string): Promise<boolean> {
   if (!userId) return false;
 
@@ -321,7 +334,7 @@ export default async function EventPage({ params, searchParams }: PageProps) {
 
   const currentUserId = await getCurrentUserId();
 
-  const [counts, currentRsvp, attendees, waitlist, interested, waitlistPosition, organizerEvents, momentsPreview, momentCounts, canPostMoment] = await Promise.all([
+  const [counts, currentRsvp, attendees, waitlist, interested, waitlistPosition, organizerEvents, momentsPreview, momentCounts, canPostMoment, sponsors] = await Promise.all([
     getEventCounts(event.id),
     getCurrentUserRsvp(event.id),
     getAttendees(event.id),
@@ -332,6 +345,7 @@ export default async function EventPage({ params, searchParams }: PageProps) {
     getMomentsPreview(event.id),
     getMomentCounts(event.id),
     canUserPostMoment(event.id, currentUserId, event.created_by),
+    getEventSponsors(event.id),
   ]);
 
   const isLoggedIn = !!currentUserId;
@@ -395,6 +409,11 @@ export default async function EventPage({ params, searchParams }: PageProps) {
                 </div>
               )}
             </div>
+
+            {/* Sponsors */}
+            {sponsors.length > 0 && (
+              <SponsorDisplay sponsors={sponsors} />
+            )}
 
             {/* Attendees */}
             <AttendeeList attendees={attendees} waitlist={waitlist} interested={interested} />
