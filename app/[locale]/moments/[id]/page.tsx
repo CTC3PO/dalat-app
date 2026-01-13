@@ -3,6 +3,9 @@ import { Link } from "@/lib/i18n/routing";
 import type { Metadata } from "next";
 import { ArrowLeft, ChevronLeft, ChevronRight, Calendar, MapPin } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import {
+  vi, ko, zhCN, ru, fr, ja, ms, th, de, es, id as idLocale, enUS
+} from "date-fns/locale";
 import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,6 +15,22 @@ import { DeleteMomentButton } from "@/components/moments/delete-moment-button";
 import { TranslatedFrom } from "@/components/ui/translation-badge";
 import { getTranslationsWithFallback, isValidContentLocale } from "@/lib/translations";
 import type { Moment, Event, Profile, ContentLocale, Locale } from "@/lib/types";
+
+// Map our locales to date-fns locales for relative time formatting
+const dateFnsLocales: Record<Locale, typeof enUS> = {
+  en: enUS,
+  vi: vi,
+  ko: ko,
+  zh: zhCN,
+  ru: ru,
+  fr: fr,
+  ja: ja,
+  ms: ms,
+  th: th,
+  de: de,
+  es: es,
+  id: idLocale,
+};
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -237,7 +256,10 @@ export default async function MomentPage({ params }: PageProps) {
   const event = moment.events;
   const profile = moment.profiles;
   const isVideo = isVideoUrl(moment.media_url);
-  const timeAgo = formatDistanceToNow(new Date(moment.created_at), { addSuffix: true });
+  const timeAgo = formatDistanceToNow(new Date(moment.created_at), {
+    addSuffix: true,
+    locale: dateFnsLocales[locale as Locale],
+  });
 
   // Get translations for text content
   const momentTranslations = await getMomentTranslations(

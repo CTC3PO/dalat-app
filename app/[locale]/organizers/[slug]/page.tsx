@@ -1,14 +1,17 @@
 import { notFound } from "next/navigation";
 import { Link } from "@/lib/i18n/routing";
+import type { Metadata } from "next";
 import { ArrowLeft, Calendar, MapPin, BadgeCheck, ExternalLink } from "lucide-react";
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatInDaLat } from "@/lib/timezone";
 import type { Organizer, Event, Locale } from "@/lib/types";
+import { generateOrganizerMetadata } from "@/lib/metadata";
+import { JsonLd, generateOrganizationSchema, generateBreadcrumbSchema } from "@/lib/structured-data";
 
 interface PageProps {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale: string }>;
 }
 
 async function getOrganizer(slug: string): Promise<Organizer | null> {
@@ -32,9 +35,26 @@ async function getOrganizerEvents(organizerId: string): Promise<Event[]> {
   return data ?? [];
 }
 
+// Generate SEO metadata for organizer pages
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug, locale } = await params;
+  const organizer = await getOrganizer(slug);
+
+  if (!organizer) {
+    return { title: "Organizer not found" };
+  }
+
+  const events = await getOrganizerEvents(organizer.id);
+  return generateOrganizerMetadata(organizer, locale as Locale, events.length);
+}
+
 export default async function OrganizerPage({ params }: PageProps) {
   const { slug } = await params;
   const locale = await getLocale();
+  const [t, tCommon] = await Promise.all([
+    getTranslations("organizer"),
+    getTranslations("common"),
+  ]);
   const organizer = await getOrganizer(slug);
 
   if (!organizer) {
@@ -48,8 +68,21 @@ export default async function OrganizerPage({ params }: PageProps) {
   const upcomingEvents = events.filter((e) => new Date(e.starts_at) >= now);
   const pastEvents = events.filter((e) => new Date(e.starts_at) < now).reverse();
 
+  // Generate structured data for SEO and AEO
+  const organizationSchema = generateOrganizationSchema(organizer, locale, events.length);
+  const breadcrumbSchema = generateBreadcrumbSchema(
+    [
+      { name: "Home", url: "/" },
+      { name: "Organizers", url: "/" },
+      { name: organizer.name, url: `/organizers/${organizer.slug}` },
+    ],
+    locale
+  );
+
   return (
     <main className="min-h-screen">
+      {/* JSON-LD Structured Data for SEO/AEO */}
+      <JsonLd data={[organizationSchema, breadcrumbSchema]} />
       {/* Header */}
       <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-14 max-w-4xl items-center mx-auto px-4">
@@ -58,7 +91,7 @@ export default async function OrganizerPage({ params }: PageProps) {
             className="-ml-3 flex items-center gap-2 text-muted-foreground hover:text-foreground active:text-foreground active:scale-95 transition-all px-3 py-2 rounded-lg"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Back</span>
+            <span>{tCommon("back")}</span>
           </Link>
         </div>
       </nav>
@@ -98,7 +131,7 @@ export default async function OrganizerPage({ params }: PageProps) {
                   rel="noopener noreferrer"
                   className="text-sm text-primary hover:underline flex items-center gap-1"
                 >
-                  Website
+                  {t("website")}
                   <ExternalLink className="w-3 h-3" />
                 </a>
               )}
@@ -131,7 +164,7 @@ export default async function OrganizerPage({ params }: PageProps) {
         {/* Upcoming events */}
         {upcomingEvents.length > 0 && (
           <section className="mb-8">
-            <h2 className="text-xl font-semibold mb-4">Upcoming Events</h2>
+            <h2 className="text-xl font-semibold mb-4">{t("upcomingEvents")}</h2>
             <div className="grid gap-4 sm:grid-cols-2">
               {upcomingEvents.map((event) => (
                 <Link key={event.id} href={`/events/${event.slug}`}>
@@ -169,7 +202,7 @@ export default async function OrganizerPage({ params }: PageProps) {
         {pastEvents.length > 0 && (
           <section>
             <h2 className="text-xl font-semibold mb-4 text-muted-foreground">
-              Past Events
+              {t("pastEvents")}
             </h2>
             <div className="space-y-2">
               {pastEvents.map((event) => (
@@ -200,7 +233,7 @@ export default async function OrganizerPage({ params }: PageProps) {
         {/* Empty state */}
         {events.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">No events yet</p>
+            <p className="text-muted-foreground">{t("noEventsYet")}</p>
           </div>
         )}
       </div>

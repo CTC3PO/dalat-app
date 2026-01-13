@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Card, CardContent } from "@/components/ui/card";
+import { LanguageStep } from "./language-step";
 import { AvatarStep } from "./avatar-step";
 import { ProfileStep } from "./profile-step";
+import type { Locale } from "@/lib/types";
 
-type Step = "avatar" | "profile";
+type Step = "language" | "avatar" | "profile";
 
 interface OnboardingFlowProps {
   userId: string;
@@ -22,8 +24,14 @@ export function OnboardingFlow({
   redirectTo = "/",
 }: OnboardingFlowProps) {
   const t = useTranslations("onboarding");
-  const [currentStep, setCurrentStep] = useState<Step>("avatar");
+  const tSettings = useTranslations("settings");
+  const currentLocale = useLocale() as Locale;
+  const [currentStep, setCurrentStep] = useState<Step>("language");
   const [selectedAvatarUrl, setSelectedAvatarUrl] = useState<string | null>(null);
+
+  const handleLanguageComplete = () => {
+    setCurrentStep("avatar");
+  };
 
   const handleAvatarComplete = (avatarUrl: string | null) => {
     setSelectedAvatarUrl(avatarUrl);
@@ -39,18 +47,37 @@ export function OnboardingFlow({
     setCurrentStep("avatar");
   };
 
+  const handleBackToLanguage = () => {
+    setCurrentStep("language");
+  };
+
+  // Get step subtitle
+  const getStepSubtitle = () => {
+    switch (currentStep) {
+      case "language":
+        return tSettings("language");
+      case "avatar":
+        return t("avatarStep.subtitle");
+      case "profile":
+        return t("profileStep.subtitle");
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="text-center">
         <h1 className="text-2xl font-bold mb-2">{t("welcome")}</h1>
-        <p className="text-muted-foreground">
-          {currentStep === "avatar" ? t("avatarStep.subtitle") : t("profileStep.subtitle")}
-        </p>
+        <p className="text-muted-foreground">{getStepSubtitle()}</p>
       </div>
 
-      {/* Step indicator */}
+      {/* Step indicator - 3 steps now */}
       <div className="flex justify-center gap-2">
+        <div
+          className={`w-2 h-2 rounded-full transition-colors ${
+            currentStep === "language" ? "bg-primary" : "bg-muted-foreground/30"
+          }`}
+        />
         <div
           className={`w-2 h-2 rounded-full transition-colors ${
             currentStep === "avatar" ? "bg-primary" : "bg-muted-foreground/30"
@@ -66,7 +93,12 @@ export function OnboardingFlow({
       {/* Content */}
       <Card>
         <CardContent className="p-6">
-          {currentStep === "avatar" ? (
+          {currentStep === "language" ? (
+            <LanguageStep
+              currentLocale={currentLocale}
+              onComplete={handleLanguageComplete}
+            />
+          ) : currentStep === "avatar" ? (
             <AvatarStep
               userId={userId}
               displayName={defaultDisplayName}

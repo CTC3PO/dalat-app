@@ -1,6 +1,7 @@
 import { Link } from "@/lib/i18n/routing";
 import Image from "next/image";
 import { ArrowLeft, Calendar, MapPin, BadgeCheck } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import type { Festival, FestivalOrganizer } from "@/lib/types";
 
@@ -29,7 +30,11 @@ async function getFestivals() {
 }
 
 export default async function FestivalsPage() {
-  const festivals = await getFestivals();
+  const [festivals, tCommon, tFestival] = await Promise.all([
+    getFestivals(),
+    getTranslations("common"),
+    getTranslations("festival"),
+  ]);
 
   // Separate active/upcoming and past festivals
   const now = new Date();
@@ -50,9 +55,9 @@ export default async function FestivalsPage() {
             className="-ml-3 flex items-center gap-2 text-muted-foreground hover:text-foreground active:text-foreground active:scale-95 transition-all px-3 py-2 rounded-lg"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Back</span>
+            <span>{tCommon("back")}</span>
           </Link>
-          <h1 className="font-semibold">Festivals</h1>
+          <h1 className="font-semibold">{tFestival("title")}</h1>
         </div>
       </header>
 
@@ -60,7 +65,7 @@ export default async function FestivalsPage() {
         {/* Active/Upcoming Festivals */}
         {activeFestivals.length > 0 && (
           <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6">Active & Upcoming</h2>
+            <h2 className="text-2xl font-bold mb-6">{tFestival("activeUpcoming")}</h2>
             <div className="grid gap-6 sm:grid-cols-2">
               {activeFestivals.map((festival) => (
                 <FestivalCard key={festival.id} festival={festival} />
@@ -73,7 +78,7 @@ export default async function FestivalsPage() {
         {pastFestivals.length > 0 && (
           <section>
             <h2 className="text-xl font-semibold mb-6 text-muted-foreground">
-              Past Festivals
+              {tFestival("pastFestivals")}
             </h2>
             <div className="grid gap-6 sm:grid-cols-2">
               {pastFestivals.map((festival) => (

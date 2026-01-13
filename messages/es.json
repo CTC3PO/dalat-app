@@ -210,7 +210,8 @@
     "addToCalendar": "Agregar al calendario",
     "googleCalendar": "Google Calendar",
     "appleOutlook": "Apple / Outlook (.ics)",
-    "addEntireSeries": "Agregar toda la serie"
+    "addEntireSeries": "Agregar toda la serie",
+    "pastFestivals": "Festivales pasados"
   },
   "series": {
     "recurringSeries": "Serie Recurrente",
@@ -302,7 +303,10 @@
     "saveChanges": "Guardar cambios",
     "continue": "Continuar",
     "generateAI": "Avatar IA",
-    "generating": "Creando..."
+    "generating": "Creando...",
+    "upcomingEvents": "Próximos eventos",
+    "pastEvents": "Eventos pasados",
+    "noEventsYet": "Aún no hay eventos"
   },
   "settings": {
     "settings": "Configuración",
@@ -446,9 +450,14 @@
     "urlTaken": "Esta URL ya está en uso",
     "urlValidation": "Solo minúsculas, números y guiones",
     "saveChanges": "Guardar cambios",
-    "createOrganizer": "Crear organizador"
+    "createOrganizer": "Crear organizador",
+    "website": "Sitio web",
+    "upcomingEvents": "Próximos eventos",
+    "pastEvents": "Eventos pasados",
+    "noEventsYet": "Aún no hay eventos"
   },
   "festival": {
+    "title": "Festivales",
     "editFestival": "Editar Festival",
     "createFestival": "Crear Festival",
     "festivalName": "Nombre del festival",
@@ -464,7 +473,8 @@
     "officialProgram": "Programa oficial",
     "communitySideEvents": "Eventos comunitarios",
     "noUpdatesYet": "¡Aún no hay actualizaciones. ¡Mantente atento!",
-    "moreDetailsSoon": "Más detalles próximamente."
+    "moreDetailsSoon": "Más detalles próximamente.",
+    "activeUpcoming": "Activos y próximos"
   },
   "analytics": {
     "created": "Creados",
@@ -706,7 +716,9 @@
     "emptyDescription": "El contenido de eventos pasados aparecerá aquí",
     "viewEvent": "Ver Evento",
     "share": "Compartir",
-    "shareSuccess": "¡Enlace copiado!"
+    "shareSuccess": "¡Enlace copiado!",
+    "recentMoments": "Momentos recientes",
+    "viewAll": "View all"
   },
   "contacts": {
     "title": "Contactos",

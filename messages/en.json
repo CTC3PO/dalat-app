@@ -314,7 +314,10 @@
     "saveChanges": "Save changes",
     "continue": "Continue",
     "generateAI": "AI Avatar",
-    "generating": "Creating..."
+    "generating": "Creating...",
+    "upcomingEvents": "Upcoming Events",
+    "pastEvents": "Past Events",
+    "noEventsYet": "No events yet"
   },
   "settings": {
     "settings": "Settings",
@@ -458,9 +461,14 @@
     "urlTaken": "This URL is already taken",
     "urlValidation": "Only lowercase letters, numbers, and hyphens",
     "saveChanges": "Save changes",
-    "createOrganizer": "Create organizer"
+    "createOrganizer": "Create organizer",
+    "website": "Website",
+    "upcomingEvents": "Upcoming Events",
+    "pastEvents": "Past Events",
+    "noEventsYet": "No events yet"
   },
   "festival": {
+    "title": "Festivals",
     "editFestival": "Edit Festival",
     "createFestival": "Create Festival",
     "festivalName": "Festival name",
@@ -476,7 +484,9 @@
     "officialProgram": "Official Program",
     "communitySideEvents": "Community Side Events",
     "noUpdatesYet": "No updates yet. Stay tuned!",
-    "moreDetailsSoon": "More details coming soon."
+    "moreDetailsSoon": "More details coming soon.",
+    "activeUpcoming": "Active & Upcoming",
+    "pastFestivals": "Past Festivals"
   },
   "analytics": {
     "created": "Created",
@@ -718,7 +728,9 @@
     "emptyDescription": "Content from past events will appear here",
     "viewEvent": "View Event",
     "share": "Share",
-    "shareSuccess": "Link copied!"
+    "shareSuccess": "Link copied!",
+    "recentMoments": "Recent Moments",
+    "viewAll": "View all"
   },
   "contacts": {
     "title": "Contacts",

@@ -210,7 +210,8 @@
     "addToCalendar": "カレンダーに追加",
     "googleCalendar": "Googleカレンダー",
     "appleOutlook": "Apple / Outlook (.ics)",
-    "addEntireSeries": "シリーズ全体を追加"
+    "addEntireSeries": "シリーズ全体を追加",
+    "pastFestivals": "過去のフェスティバル"
   },
   "series": {
     "recurringSeries": "定期シリーズ",
@@ -302,7 +303,10 @@
     "saveChanges": "変更を保存",
     "continue": "続ける",
     "generateAI": "AIアバター",
-    "generating": "作成中..."
+    "generating": "作成中...",
+    "upcomingEvents": "今後のイベント",
+    "pastEvents": "過去のイベント",
+    "noEventsYet": "まだイベントがありません"
   },
   "settings": {
     "settings": "設定",
@@ -446,9 +450,14 @@
     "urlTaken": "このURLは既に使用されています",
     "urlValidation": "小文字、数字、ハイフンのみ",
     "saveChanges": "変更を保存",
-    "createOrganizer": "主催者を作成"
+    "createOrganizer": "主催者を作成",
+    "website": "ウェブサイト",
+    "upcomingEvents": "今後のイベント",
+    "pastEvents": "過去のイベント",
+    "noEventsYet": "まだイベントがありません"
   },
   "festival": {
+    "title": "フェスティバル",
     "editFestival": "フェスティバルを編集",
     "createFestival": "フェスティバルを作成",
     "festivalName": "フェスティバル名",
@@ -464,7 +473,8 @@
     "officialProgram": "公式プログラム",
     "communitySideEvents": "コミュニティイベント",
     "noUpdatesYet": "まだ更新情報はありません。お楽しみに！",
-    "moreDetailsSoon": "詳細は近日公開予定。"
+    "moreDetailsSoon": "詳細は近日公開予定。",
+    "activeUpcoming": "現在開催中と今後"
   },
   "analytics": {
     "created": "作成済み",
@@ -706,7 +716,9 @@
     "emptyDescription": "過去のイベントのコンテンツがここに表示されます",
     "viewEvent": "イベントを見る",
     "share": "共有",
-    "shareSuccess": "リンクがコピーされました！"
+    "shareSuccess": "リンクがコピーされました！",
+    "recentMoments": "最近の瞬間",
+    "viewAll": "View all"
   },
   "contacts": {
     "title": "連絡先",

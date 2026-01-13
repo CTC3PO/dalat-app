@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { Link } from "@/lib/i18n/routing";
 import Image from "next/image";
+import type { Metadata } from "next";
 import {
   ArrowLeft,
   Calendar,
@@ -10,12 +11,15 @@ import {
   Share2,
   BadgeCheck,
 } from "lucide-react";
+import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
-import type { Festival, FestivalOrganizer, FestivalEvent, FestivalUpdate } from "@/lib/types";
+import type { Festival, FestivalOrganizer, FestivalEvent, FestivalUpdate, Locale } from "@/lib/types";
 import { FestivalTabs } from "@/components/festivals/festival-tabs";
+import { generateFestivalMetadata } from "@/lib/metadata";
+import { JsonLd, generateFestivalSchema, generateBreadcrumbSchema } from "@/lib/structured-data";
 
 interface FestivalPageProps {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale: string }>;
 }
 
 async function getFestival(slug: string) {
@@ -82,8 +86,25 @@ async function getFestivalUpdates(festivalId: string) {
   return (data ?? []) as FestivalUpdate[];
 }
 
+// Generate SEO metadata for festival pages
+export async function generateMetadata({ params }: FestivalPageProps): Promise<Metadata> {
+  const { slug, locale } = await params;
+  const festival = await getFestival(slug);
+
+  if (!festival) {
+    return { title: "Festival not found" };
+  }
+
+  const events = await getFestivalEvents(festival.id);
+  return generateFestivalMetadata(festival, locale as Locale, events.length);
+}
+
 export default async function FestivalPage({ params }: FestivalPageProps) {
   const { slug } = await params;
+  const [tCommon, tEvents] = await Promise.all([
+    getTranslations("common"),
+    getTranslations("events"),
+  ]);
   const festival = await getFestival(slug);
 
   if (!festival) {
@@ -120,8 +141,22 @@ export default async function FestivalPage({ params }: FestivalPageProps) {
     (e) => e.event_type === "community_side_event"
   );
 
+  // Generate structured data for SEO and AEO
+  const locale = await getLocale();
+  const festivalSchema = generateFestivalSchema(festival, locale, events.length);
+  const breadcrumbSchema = generateBreadcrumbSchema(
+    [
+      { name: "Home", url: "/" },
+      { name: "Festivals", url: "/festivals" },
+      { name: festival.title, url: `/festivals/${festival.slug}` },
+    ],
+    locale
+  );
+
   return (
     <div className="min-h-screen">
+      {/* JSON-LD Structured Data for SEO/AEO */}
+      <JsonLd data={[festivalSchema, breadcrumbSchema]} />
       {/* Hero Section */}
       <div className="relative">
         {/* Cover Image */}
@@ -147,7 +182,7 @@ export default async function FestivalPage({ params }: FestivalPageProps) {
             className="-ml-3 flex items-center gap-2 text-white/90 hover:text-white active:text-white active:scale-95 transition-all px-3 py-2 rounded-lg bg-black/20 backdrop-blur-sm"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Back</span>
+            <span>{tCommon("back")}</span>
           </Link>
         </div>
 
@@ -189,7 +224,7 @@ export default async function FestivalPage({ params }: FestivalPageProps) {
           festival.festival_organizers.length > 0 && (
             <div className="mb-8 p-4 rounded-lg border bg-card">
               <p className="text-xs text-muted-foreground uppercase tracking-wider mb-3">
-                Organized by
+                {tEvents("organizedBy")}
               </p>
               <div className="flex flex-wrap gap-4">
                 {festival.festival_organizers.filter((fo) => fo.organizers).map((fo) => (

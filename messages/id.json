@@ -210,7 +210,8 @@
     "addToCalendar": "Tambah ke kalender",
     "googleCalendar": "Google Calendar",
     "appleOutlook": "Apple / Outlook (.ics)",
-    "addEntireSeries": "Tambah seluruh seri"
+    "addEntireSeries": "Tambah seluruh seri",
+    "pastFestivals": "Festival Sebelumnya"
   },
   "series": {
     "recurringSeries": "Seri Berulang",
@@ -302,7 +303,10 @@
     "saveChanges": "Simpan perubahan",
     "continue": "Lanjutkan",
     "generateAI": "Avatar AI",
-    "generating": "Membuat..."
+    "generating": "Membuat...",
+    "upcomingEvents": "Acara Mendatang",
+    "pastEvents": "Acara Sebelumnya",
+    "noEventsYet": "Belum ada acara"
   },
   "settings": {
     "settings": "Pengaturan",
@@ -446,9 +450,14 @@
     "urlTaken": "URL ini sudah digunakan",
     "urlValidation": "Hanya huruf kecil, angka, dan tanda hubung",
     "saveChanges": "Simpan perubahan",
-    "createOrganizer": "Buat penyelenggara"
+    "createOrganizer": "Buat penyelenggara",
+    "website": "Situs web",
+    "upcomingEvents": "Acara Mendatang",
+    "pastEvents": "Acara Sebelumnya",
+    "noEventsYet": "Belum ada acara"
   },
   "festival": {
+    "title": "Festival",
     "editFestival": "Edit Festival",
     "createFestival": "Buat Festival",
     "festivalName": "Nama festival",
@@ -464,7 +473,8 @@
     "officialProgram": "Program Resmi",
     "communitySideEvents": "Acara Komunitas",
     "noUpdatesYet": "Belum ada pembaruan. Pantau terus!",
-    "moreDetailsSoon": "Detail lebih lanjut segera hadir."
+    "moreDetailsSoon": "Detail lebih lanjut segera hadir.",
+    "activeUpcoming": "Aktif & Mendatang"
   },
   "analytics": {
     "created": "Dibuat",
@@ -706,7 +716,9 @@
     "emptyDescription": "Konten dari acara yang sudah berlalu akan muncul di sini",
     "viewEvent": "Lihat Acara",
     "share": "Bagikan",
-    "shareSuccess": "Tautan disalin!"
+    "shareSuccess": "Tautan disalin!",
+    "recentMoments": "Momen Terbaru",
+    "viewAll": "View all"
   },
   "contacts": {
     "title": "Kontak",

@@ -7,6 +7,7 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { getTranslationsWithFallback, isValidContentLocale } from "@/lib/translations";
 import type { ContentLocale, Locale } from "@/lib/types";
+import { JsonLd, generateEventSchema, generateBreadcrumbSchema } from "@/lib/structured-data";
 import { TranslatedFrom } from "@/components/ui/translation-badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { RsvpButton } from "@/components/events/rsvp-button";
@@ -418,8 +419,22 @@ export default async function EventPage({ params, searchParams }: PageProps) {
     ? `${counts?.going_spots ?? 0}/${event.capacity}`
     : `${counts?.going_spots ?? 0}`;
 
+  // Generate structured data for SEO and AEO
+  const eventSchema = generateEventSchema(event, locale, counts?.going_spots);
+  const breadcrumbSchema = generateBreadcrumbSchema(
+    [
+      { name: "Home", url: "/" },
+      { name: "Events", url: "/" },
+      { name: event.title, url: `/events/${event.slug}` },
+    ],
+    locale
+  );
+
   return (
     <main className="min-h-screen">
+      {/* JSON-LD Structured Data for SEO/AEO */}
+      <JsonLd data={[eventSchema, breadcrumbSchema]} />
+
       <Suspense fallback={null}>
         <ConfirmAttendanceHandler eventId={event.id} />
       </Suspense>

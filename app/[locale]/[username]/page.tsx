@@ -1,16 +1,19 @@
 import { notFound } from "next/navigation";
 import { Link } from "@/lib/i18n/routing";
+import type { Metadata } from "next";
 import { ArrowLeft, Calendar } from "lucide-react";
 import { format } from "date-fns";
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent } from "@/components/ui/card";
 import { TranslatedFrom } from "@/components/ui/translation-badge";
 import { getTranslationsWithFallback, isValidContentLocale } from "@/lib/translations";
-import type { Profile, Event, ContentLocale } from "@/lib/types";
+import type { Profile, Event, ContentLocale, Locale } from "@/lib/types";
+import { generateProfileMetadata } from "@/lib/metadata";
+import { JsonLd, generatePersonSchema, generateBreadcrumbSchema } from "@/lib/structured-data";
 
 interface PageProps {
-  params: Promise<{ username: string }>;
+  params: Promise<{ username: string; locale: string }>;
 }
 
 async function getProfile(username: string): Promise<Profile | null> {
@@ -105,6 +108,23 @@ async function getBioTranslations(
   };
 }
 
+// Generate SEO metadata for profile pages
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { username: rawUsername, locale } = await params;
+  const decoded = decodeURIComponent(rawUsername);
+  const username = decoded.startsWith("@") ? decoded.slice(1) : decoded;
+
+  const profile = await getProfile(username);
+  if (!profile) {
+    return { title: "Profile not found" };
+  }
+
+  // Get event count for description
+  const events = await getUserEvents(profile.id);
+
+  return generateProfileMetadata(profile, locale as Locale, events.length);
+}
+
 export default async function ProfilePage({ params }: PageProps) {
   const { username: rawUsername } = await params;
   // Strip @ prefix if present (supports both /@username and /username)
@@ -118,6 +138,10 @@ export default async function ProfilePage({ params }: PageProps) {
   }
 
   const locale = await getLocale();
+  const [t, tCommon] = await Promise.all([
+    getTranslations("profile"),
+    getTranslations("common"),
+  ]);
 
   const [events, isOwner, bioTranslations] = await Promise.all([
     getUserEvents(profile.id),
@@ -130,8 +154,20 @@ export default async function ProfilePage({ params }: PageProps) {
   );
   const pastEvents = events.filter((e) => new Date(e.starts_at) <= new Date());
 
+  // Generate structured data for SEO and AEO
+  const personSchema = generatePersonSchema(profile, locale, events.length);
+  const breadcrumbSchema = generateBreadcrumbSchema(
+    [
+      { name: "Home", url: "/" },
+      { name: profile.display_name || profile.username || "Profile", url: `/${profile.username}` },
+    ],
+    locale
+  );
+
   return (
     <main className="min-h-screen">
+      {/* JSON-LD Structured Data for SEO/AEO */}
+      <JsonLd data={[personSchema, breadcrumbSchema]} />
       {/* Header */}
       <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-14 max-w-4xl items-center mx-auto px-4">
@@ -140,7 +176,7 @@ export default async function ProfilePage({ params }: PageProps) {
             className="-ml-3 flex items-center gap-2 text-muted-foreground hover:text-foreground active:text-foreground active:scale-95 transition-all px-3 py-2 rounded-lg"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Back</span>
+            <span>{tCommon("back")}</span>
           </Link>
         </div>
       </nav>
@@ -159,7 +195,7 @@ export default async function ProfilePage({ params }: PageProps) {
           )}
           <div className="flex-1">
             <h1 className="text-2xl font-bold">
-              {profile.display_name || profile.username || "Anonymous"}
+              {profile.display_name || profile.username || tCommon("anonymous")}
             </h1>
             {profile.username && (
               <p className="text-muted-foreground">@{profile.username}</p>
@@ -180,7 +216,7 @@ export default async function ProfilePage({ params }: PageProps) {
                 href="/settings/profile"
                 className="text-sm text-primary hover:underline mt-2 inline-block"
               >
-                Edit profile
+                {t("editProfile")}
               </Link>
             )}
           </div>
@@ -190,7 +226,7 @@ export default async function ProfilePage({ params }: PageProps) {
         <div className="space-y-8">
           {upcomingEvents.length > 0 && (
             <section>
-              <h2 className="text-lg font-semibold mb-4">Upcoming Events</h2>
+              <h2 className="text-lg font-semibold mb-4">{t("upcomingEvents")}</h2>
               <div className="space-y-3">
                 {upcomingEvents.map((event) => (
                   <Link key={event.id} href={`/events/${event.slug}`}>
@@ -214,7 +250,7 @@ export default async function ProfilePage({ params }: PageProps) {
           {pastEvents.length > 0 && (
             <section>
               <h2 className="text-lg font-semibold mb-4 text-muted-foreground">
-                Past Events
+                {t("pastEvents")}
               </h2>
               <div className="space-y-3">
                 {pastEvents.map((event) => (
@@ -238,7 +274,7 @@ export default async function ProfilePage({ params }: PageProps) {
 
           {events.length === 0 && (
             <p className="text-muted-foreground text-center py-8">
-              No events yet
+              {t("noEventsYet")}
             </p>
           )}
         </div>

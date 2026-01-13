@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Calendar, CalendarPlus, Check, Repeat, Loader2 } from "lucide-react";
 import {
   Dialog,
@@ -30,6 +31,7 @@ export function SeriesRsvpModal({
   eventDate,
 }: SeriesRsvpModalProps) {
   const router = useRouter();
+  const t = useTranslations("series.rsvpModal");
   const [loading, setLoading] = useState<RsvpChoice | null>(null);
   const [completed, setCompleted] = useState<RsvpChoice | null>(null);
 
@@ -91,10 +93,10 @@ export function SeriesRsvpModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Check className="w-5 h-5 text-green-500" />
-            You&apos;re going!
+            {t("title")}
           </DialogTitle>
           <DialogDescription>
-            This event is part of a recurring series ({recurrenceLabel}).
+            {t("description", { pattern: recurrenceLabel })}
           </DialogDescription>
         </DialogHeader>
 
@@ -117,9 +119,9 @@ export function SeriesRsvpModal({
                 )}
               </div>
               <div className="text-left">
-                <p className="font-medium">Just this event</p>
+                <p className="font-medium">{t("justThisEvent")}</p>
                 <p className="text-sm text-muted-foreground">
-                  Only RSVP for {eventDate}
+                  {t("justThisEventDesc", { date: eventDate })}
                 </p>
               </div>
               {completed !== "this_only" && (
@@ -146,9 +148,9 @@ export function SeriesRsvpModal({
                 )}
               </div>
               <div className="text-left">
-                <p className="font-medium">RSVP to all future events</p>
+                <p className="font-medium">{t("allFutureEvents")}</p>
                 <p className="text-sm text-muted-foreground">
-                  Auto-RSVP when new dates are added
+                  {t("allFutureEventsDesc")}
                 </p>
               </div>
             </div>
@@ -172,9 +174,9 @@ export function SeriesRsvpModal({
                 )}
               </div>
               <div className="text-left">
-                <p className="font-medium">Add series to calendar</p>
+                <p className="font-medium">{t("addToCalendar")}</p>
                 <p className="text-sm text-muted-foreground">
-                  Download and subscribe in your calendar app
+                  {t("addToCalendarDesc")}
                 </p>
               </div>
             </div>
@@ -183,7 +185,7 @@ export function SeriesRsvpModal({
 
         <div className="pt-2 border-t">
           <Button variant="ghost" onClick={onClose} className="w-full">
-            Done
+            {t("done")}
           </Button>
         </div>
       </DialogContent>

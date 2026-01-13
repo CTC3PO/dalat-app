@@ -1,0 +1,140 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { Check, Globe } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useRouter, usePathname } from "@/lib/i18n/routing";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { LOCALE_FLAGS, LOCALE_NAMES, type Locale } from "@/lib/types";
+
+interface LanguageStepProps {
+  currentLocale: Locale;
+  onComplete: (locale: Locale) => void;
+}
+
+// All 12 supported locales
+const ALL_LOCALES: Locale[] = ['en', 'vi', 'ko', 'zh', 'ru', 'fr', 'ja', 'ms', 'th', 'de', 'es', 'id'];
+
+// Map browser language codes to our locales
+const BROWSER_LOCALE_MAP: Record<string, Locale> = {
+  'en': 'en', 'en-US': 'en', 'en-GB': 'en',
+  'vi': 'vi', 'vi-VN': 'vi',
+  'ko': 'ko', 'ko-KR': 'ko',
+  'zh': 'zh', 'zh-CN': 'zh', 'zh-TW': 'zh', 'zh-HK': 'zh',
+  'ru': 'ru', 'ru-RU': 'ru',
+  'fr': 'fr', 'fr-FR': 'fr', 'fr-CA': 'fr',
+  'ja': 'ja', 'ja-JP': 'ja',
+  'ms': 'ms', 'ms-MY': 'ms',
+  'th': 'th', 'th-TH': 'th',
+  'de': 'de', 'de-DE': 'de', 'de-AT': 'de', 'de-CH': 'de',
+  'es': 'es', 'es-ES': 'es', 'es-MX': 'es',
+  'id': 'id', 'id-ID': 'id',
+};
+
+export function LanguageStep({ currentLocale, onComplete }: LanguageStepProps) {
+  const t = useTranslations("onboarding");
+  const tSettings = useTranslations("settings");
+  const router = useRouter();
+  const pathname = usePathname();
+  const [selectedLocale, setSelectedLocale] = useState<Locale>(currentLocale);
+  const [detectedLocale, setDetectedLocale] = useState<Locale | null>(null);
+
+  // Detect browser language on mount
+  useEffect(() => {
+    if (typeof navigator !== 'undefined') {
+      const browserLang = navigator.language || (navigator as unknown as { userLanguage?: string }).userLanguage;
+      if (browserLang) {
+        // Try exact match first, then base language
+        const detected = BROWSER_LOCALE_MAP[browserLang] || BROWSER_LOCALE_MAP[browserLang.split('-')[0]];
+        if (detected) {
+          setDetectedLocale(detected);
+          // Pre-select detected language if different from current
+          if (detected !== currentLocale) {
+            setSelectedLocale(detected);
+          }
+        }
+      }
+    }
+  }, [currentLocale]);
+
+  const handleSelectLocale = (locale: Locale) => {
+    setSelectedLocale(locale);
+  };
+
+  const handleContinue = () => {
+    // If language changed, navigate to update locale
+    if (selectedLocale !== currentLocale) {
+      router.replace(pathname, { locale: selectedLocale });
+    }
+    onComplete(selectedLocale);
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header icon */}
+      <div className="flex justify-center">
+        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+          <Globe className="w-8 h-8 text-primary" />
+        </div>
+      </div>
+
+      {/* Description */}
+      <p className="text-center text-muted-foreground">
+        {tSettings("languageDescription")}
+      </p>
+
+      {/* Language grid */}
+      <div className="grid grid-cols-3 gap-2">
+        {ALL_LOCALES.map((locale) => {
+          const isSelected = selectedLocale === locale;
+          const isDetected = detectedLocale === locale;
+
+          return (
+            <button
+              key={locale}
+              type="button"
+              onClick={() => handleSelectLocale(locale)}
+              className={cn(
+                "relative flex flex-col items-center gap-1 p-3 rounded-xl border-2 transition-all",
+                "hover:bg-accent active:scale-95",
+                isSelected
+                  ? "border-primary bg-primary/5"
+                  : "border-muted hover:border-primary/30"
+              )}
+            >
+              {/* Detected indicator */}
+              {isDetected && !isSelected && (
+                <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-green-500" />
+              )}
+
+              {/* Selected checkmark */}
+              {isSelected && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                  <Check className="w-3 h-3 text-primary-foreground" />
+                </span>
+              )}
+
+              <span className="text-2xl">{LOCALE_FLAGS[locale]}</span>
+              <span className="text-xs font-medium truncate w-full text-center">
+                {LOCALE_NAMES[locale]}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Detected hint */}
+      {detectedLocale && detectedLocale !== selectedLocale && (
+        <p className="text-xs text-center text-muted-foreground">
+          Detected: {LOCALE_FLAGS[detectedLocale]} {LOCALE_NAMES[detectedLocale]}
+        </p>
+      )}
+
+      {/* Continue button */}
+      <Button onClick={handleContinue} className="w-full">
+        {t("continue")}
+      </Button>
+    </div>
+  );
+}

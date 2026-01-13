@@ -210,7 +210,8 @@
     "addToCalendar": "添加到日历",
     "googleCalendar": "Google 日历",
     "appleOutlook": "Apple / Outlook (.ics)",
-    "addEntireSeries": "添加整个系列"
+    "addEntireSeries": "添加整个系列",
+    "pastFestivals": "往期节日"
   },
   "series": {
     "recurringSeries": "系列活动",
@@ -302,7 +303,10 @@
     "saveChanges": "保存更改",
     "continue": "继续",
     "generateAI": "AI头像",
-    "generating": "生成中..."
+    "generating": "生成中...",
+    "upcomingEvents": "即将举行的活动",
+    "pastEvents": "过去的活动",
+    "noEventsYet": "暂无活动"
   },
   "settings": {
     "settings": "设置",
@@ -446,9 +450,14 @@
     "urlTaken": "此 URL 已被使用",
     "urlValidation": "仅限小写字母、数字和连字符",
     "saveChanges": "保存更改",
-    "createOrganizer": "创建主办方"
+    "createOrganizer": "创建主办方",
+    "website": "网站",
+    "upcomingEvents": "即将举行的活动",
+    "pastEvents": "过去的活动",
+    "noEventsYet": "暂无活动"
   },
   "festival": {
+    "title": "节日活动",
     "editFestival": "编辑节日",
     "createFestival": "创建节日",
     "festivalName": "节日名称",
@@ -464,7 +473,8 @@
     "officialProgram": "官方节目",
     "communitySideEvents": "社区活动",
     "noUpdatesYet": "暂无更新。敬请期待！",
-    "moreDetailsSoon": "更多详情即将公布。"
+    "moreDetailsSoon": "更多详情即将公布。",
+    "activeUpcoming": "进行中和即将举行"
   },
   "analytics": {
     "created": "已创建",
@@ -706,7 +716,9 @@
     "emptyDescription": "过去活动的内容将显示在这里",
     "viewEvent": "查看活动",
     "share": "分享",
-    "shareSuccess": "链接已复制！"
+    "shareSuccess": "链接已复制！",
+    "recentMoments": "最近时刻",
+    "viewAll": "View all"
   },
   "contacts": {
     "title": "联系人",

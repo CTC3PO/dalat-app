@@ -210,7 +210,8 @@
     "addToCalendar": "Thêm vào lịch",
     "googleCalendar": "Google Calendar",
     "appleOutlook": "Apple / Outlook (.ics)",
-    "addEntireSeries": "Thêm toàn bộ chuỗi"
+    "addEntireSeries": "Thêm toàn bộ chuỗi",
+    "pastFestivals": "Lễ hội đã qua"
   },
   "series": {
     "recurringSeries": "Chuỗi sự kiện lặp lại",
@@ -302,7 +303,10 @@
     "saveChanges": "Lưu thay đổi",
     "continue": "Tiếp tục",
     "generateAI": "AI Avatar",
-    "generating": "Đang tạo..."
+    "generating": "Đang tạo...",
+    "upcomingEvents": "Sự kiện sắp tới",
+    "pastEvents": "Sự kiện đã qua",
+    "noEventsYet": "Chưa có sự kiện nào"
   },
   "settings": {
     "settings": "Cài đặt",
@@ -446,9 +450,14 @@
     "urlTaken": "URL này đã được sử dụng",
     "urlValidation": "Chỉ chữ thường, số và dấu gạch ngang",
     "saveChanges": "Lưu thay đổi",
-    "createOrganizer": "Tạo tổ chức"
+    "createOrganizer": "Tạo tổ chức",
+    "website": "Trang web",
+    "upcomingEvents": "Sự kiện sắp tới",
+    "pastEvents": "Sự kiện đã qua",
+    "noEventsYet": "Chưa có sự kiện nào"
   },
   "festival": {
+    "title": "Lễ hội",
     "editFestival": "Chỉnh sửa lễ hội",
     "createFestival": "Tạo lễ hội",
     "festivalName": "Tên lễ hội",
@@ -464,7 +473,8 @@
     "officialProgram": "Chương trình chính thức",
     "communitySideEvents": "Sự kiện cộng đồng",
     "noUpdatesYet": "Chưa có cập nhật. Hãy theo dõi!",
-    "moreDetailsSoon": "Thêm chi tiết sẽ sớm có."
+    "moreDetailsSoon": "Thêm chi tiết sẽ sớm có.",
+    "activeUpcoming": "Đang diễn ra & Sắp tới"
   },
   "analytics": {
     "created": "Đã tạo",
@@ -706,7 +716,9 @@
     "emptyDescription": "Nội dung từ các sự kiện đã qua sẽ xuất hiện ở đây",
     "viewEvent": "Xem sự kiện",
     "share": "Chia sẻ",
-    "shareSuccess": "Đã sao chép liên kết!"
+    "shareSuccess": "Đã sao chép liên kết!",
+    "recentMoments": "Khoảnh khắc gần đây",
+    "viewAll": "View all"
   },
   "translations": {
     "autoTranslatedFrom": "Dịch tự động từ {language}",

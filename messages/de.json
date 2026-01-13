@@ -210,7 +210,8 @@
     "addToCalendar": "Zum Kalender hinzufügen",
     "googleCalendar": "Google Kalender",
     "appleOutlook": "Apple / Outlook (.ics)",
-    "addEntireSeries": "Gesamte Serie hinzufügen"
+    "addEntireSeries": "Gesamte Serie hinzufügen",
+    "pastFestivals": "Vergangene Festivals"
   },
   "series": {
     "recurringSeries": "Wiederkehrende Serie",
@@ -302,7 +303,10 @@
     "saveChanges": "Änderungen speichern",
     "continue": "Weiter",
     "generateAI": "KI-Avatar",
-    "generating": "Wird erstellt..."
+    "generating": "Wird erstellt...",
+    "upcomingEvents": "Kommende Veranstaltungen",
+    "pastEvents": "Vergangene Veranstaltungen",
+    "noEventsYet": "Noch keine Veranstaltungen"
   },
   "settings": {
     "settings": "Einstellungen",
@@ -446,9 +450,14 @@
     "urlTaken": "Diese URL ist bereits vergeben",
     "urlValidation": "Nur Kleinbuchstaben, Zahlen und Bindestriche",
     "saveChanges": "Änderungen speichern",
-    "createOrganizer": "Veranstalter erstellen"
+    "createOrganizer": "Veranstalter erstellen",
+    "website": "Webseite",
+    "upcomingEvents": "Kommende Veranstaltungen",
+    "pastEvents": "Vergangene Veranstaltungen",
+    "noEventsYet": "Noch keine Veranstaltungen"
   },
   "festival": {
+    "title": "Festivals",
     "editFestival": "Festival bearbeiten",
     "createFestival": "Festival erstellen",
     "festivalName": "Festival-Name",
@@ -464,7 +473,8 @@
     "officialProgram": "Offizielles Programm",
     "communitySideEvents": "Community-Veranstaltungen",
     "noUpdatesYet": "Noch keine Updates. Bleib dran!",
-    "moreDetailsSoon": "Mehr Details folgen bald."
+    "moreDetailsSoon": "Mehr Details folgen bald.",
+    "activeUpcoming": "Aktiv & Kommend"
   },
   "analytics": {
     "created": "Erstellt",
@@ -706,7 +716,9 @@
     "emptyDescription": "Inhalte von vergangenen Events erscheinen hier",
     "viewEvent": "Event ansehen",
     "share": "Teilen",
-    "shareSuccess": "Link kopiert!"
+    "shareSuccess": "Link kopiert!",
+    "recentMoments": "Neueste Momente",
+    "viewAll": "View all"
   },
   "contacts": {
     "title": "Kontakte",

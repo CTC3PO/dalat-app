@@ -210,7 +210,8 @@
     "addToCalendar": "Ajouter au calendrier",
     "googleCalendar": "Google Agenda",
     "appleOutlook": "Apple / Outlook (.ics)",
-    "addEntireSeries": "Ajouter toute la série"
+    "addEntireSeries": "Ajouter toute la série",
+    "pastFestivals": "Festivals passés"
   },
   "series": {
     "recurringSeries": "Série récurrente",
@@ -302,7 +303,10 @@
     "saveChanges": "Enregistrer",
     "continue": "Continuer",
     "generateAI": "Avatar IA",
-    "generating": "Création..."
+    "generating": "Création...",
+    "upcomingEvents": "Événements à venir",
+    "pastEvents": "Événements passés",
+    "noEventsYet": "Pas encore d'événements"
   },
   "settings": {
     "settings": "Paramètres",
@@ -446,9 +450,14 @@
     "urlTaken": "Cette URL est déjà prise",
     "urlValidation": "Uniquement lettres minuscules, chiffres et tirets",
     "saveChanges": "Enregistrer les modifications",
-    "createOrganizer": "Créer l'organisateur"
+    "createOrganizer": "Créer l'organisateur",
+    "website": "Site web",
+    "upcomingEvents": "Événements à venir",
+    "pastEvents": "Événements passés",
+    "noEventsYet": "Pas encore d'événements"
   },
   "festival": {
+    "title": "Festivals",
     "editFestival": "Modifier le festival",
     "createFestival": "Créer un festival",
     "festivalName": "Nom du festival",
@@ -464,7 +473,8 @@
     "officialProgram": "Programme officiel",
     "communitySideEvents": "Événements communautaires",
     "noUpdatesYet": "Pas encore d'actualités. Restez à l'écoute !",
-    "moreDetailsSoon": "Plus de détails bientôt."
+    "moreDetailsSoon": "Plus de détails bientôt.",
+    "activeUpcoming": "Actifs et à venir"
   },
   "analytics": {
     "created": "Créés",
@@ -706,7 +716,9 @@
     "emptyDescription": "Le contenu des événements passés apparaîtra ici",
     "viewEvent": "Voir l'événement",
     "share": "Partager",
-    "shareSuccess": "Lien copié !"
+    "shareSuccess": "Lien copié !",
+    "recentMoments": "Moments récents",
+    "viewAll": "View all"
   },
   "translations": {
     "autoTranslatedFrom": "Traduit automatiquement de {language}",

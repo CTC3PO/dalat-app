@@ -210,7 +210,8 @@
     "addToCalendar": "Добавить в календарь",
     "googleCalendar": "Google Календарь",
     "appleOutlook": "Apple / Outlook (.ics)",
-    "addEntireSeries": "Добавить всю серию"
+    "addEntireSeries": "Добавить всю серию",
+    "pastFestivals": "Прошедшие фестивали"
   },
   "series": {
     "recurringSeries": "Повторяющаяся серия",
@@ -302,7 +303,10 @@
     "saveChanges": "Сохранить изменения",
     "continue": "Продолжить",
     "generateAI": "ИИ-аватар",
-    "generating": "Создание..."
+    "generating": "Создание...",
+    "upcomingEvents": "Предстоящие события",
+    "pastEvents": "Прошедшие события",
+    "noEventsYet": "Пока нет событий"
   },
   "settings": {
     "settings": "Настройки",
@@ -446,9 +450,14 @@
     "urlTaken": "Этот URL уже занят",
     "urlValidation": "Только строчные буквы, цифры и дефисы",
     "saveChanges": "Сохранить изменения",
-    "createOrganizer": "Создать организатора"
+    "createOrganizer": "Создать организатора",
+    "website": "Сайт",
+    "upcomingEvents": "Предстоящие события",
+    "pastEvents": "Прошедшие события",
+    "noEventsYet": "Пока нет событий"
   },
   "festival": {
+    "title": "Фестивали",
     "editFestival": "Редактировать фестиваль",
     "createFestival": "Создать фестиваль",
     "festivalName": "Название фестиваля",
@@ -464,7 +473,8 @@
     "officialProgram": "Официальная программа",
     "communitySideEvents": "События сообщества",
     "noUpdatesYet": "Пока нет обновлений. Следите за новостями!",
-    "moreDetailsSoon": "Подробности скоро."
+    "moreDetailsSoon": "Подробности скоро.",
+    "activeUpcoming": "Активные и предстоящие"
   },
   "analytics": {
     "created": "Создано",
@@ -706,7 +716,9 @@
     "emptyDescription": "Контент с прошедших событий появится здесь",
     "viewEvent": "Смотреть событие",
     "share": "Поделиться",
-    "shareSuccess": "Ссылка скопирована!"
+    "shareSuccess": "Ссылка скопирована!",
+    "recentMoments": "Недавние моменты",
+    "viewAll": "View all"
   },
   "contacts": {
     "title": "Контакты",

@@ -210,7 +210,8 @@
     "addToCalendar": "เพิ่มลงปฏิทิน",
     "googleCalendar": "Google Calendar",
     "appleOutlook": "Apple / Outlook (.ics)",
-    "addEntireSeries": "เพิ่มทั้งชุด"
+    "addEntireSeries": "เพิ่มทั้งชุด",
+    "pastFestivals": "เทศกาลที่ผ่านมา"
   },
   "series": {
     "recurringSeries": "ซีรีส์ที่เกิดซ้ำ",
@@ -302,7 +303,10 @@
     "saveChanges": "บันทึกการเปลี่ยนแปลง",
     "continue": "ดำเนินการต่อ",
     "generateAI": "AI อวาตาร์",
-    "generating": "กำลังสร้าง..."
+    "generating": "กำลังสร้าง...",
+    "upcomingEvents": "กิจกรรมที่จะมาถึง",
+    "pastEvents": "กิจกรรมที่ผ่านมา",
+    "noEventsYet": "ยังไม่มีกิจกรรม"
   },
   "settings": {
     "settings": "การตั้งค่า",
@@ -446,9 +450,14 @@
     "urlTaken": "URL นี้ถูกใช้แล้ว",
     "urlValidation": "ตัวพิมพ์เล็ก ตัวเลข และเครื่องหมายขีดกลางเท่านั้น",
     "saveChanges": "บันทึกการเปลี่ยนแปลง",
-    "createOrganizer": "สร้างผู้จัด"
+    "createOrganizer": "สร้างผู้จัด",
+    "website": "เว็บไซต์",
+    "upcomingEvents": "กิจกรรมที่จะมาถึง",
+    "pastEvents": "กิจกรรมที่ผ่านมา",
+    "noEventsYet": "ยังไม่มีกิจกรรม"
   },
   "festival": {
+    "title": "เทศกาล",
     "editFestival": "แก้ไขเทศกาล",
     "createFestival": "สร้างเทศกาล",
     "festivalName": "ชื่อเทศกาล",
@@ -464,7 +473,8 @@
     "officialProgram": "โปรแกรมอย่างเป็นทางการ",
     "communitySideEvents": "กิจกรรมชุมชน",
     "noUpdatesYet": "ยังไม่มีอัปเดต ติดตามต่อไป!",
-    "moreDetailsSoon": "รายละเอียดเพิ่มเติมเร็วๆ นี้"
+    "moreDetailsSoon": "รายละเอียดเพิ่มเติมเร็วๆ นี้",
+    "activeUpcoming": "กำลังจัดและจะมาถึง"
   },
   "analytics": {
     "created": "สร้างแล้ว",
@@ -706,7 +716,9 @@
     "emptyDescription": "เนื้อหาจากกิจกรรมที่ผ่านมาจะปรากฏที่นี่",
     "viewEvent": "ดูกิจกรรม",
     "share": "แชร์",
-    "shareSuccess": "คัดลอกลิงก์แล้ว!"
+    "shareSuccess": "คัดลอกลิงก์แล้ว!",
+    "recentMoments": "ช่วงเวลาล่าสุด",
+    "viewAll": "View all"
   },
   "contacts": {
     "title": "รายชื่อติดต่อ",
