@@ -10,20 +10,14 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Mail, Eye, EyeOff } from "lucide-react";
 import { Link } from "@/lib/i18n/routing";
 
-type AuthMode = "login" | "signup";
-
 export function EmailAuthForm() {
   const t = useTranslations("auth");
-  const [mode, setMode] = useState<AuthMode>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-
-  const isSignup = mode === "signup";
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -32,11 +26,6 @@ export function EmailAuthForm() {
 
     if (!email || !password) {
       setError(t("emailPasswordRequired"));
-      return;
-    }
-
-    if (isSignup && password !== confirmPassword) {
-      setError(t("passwordsDoNotMatch"));
       return;
     }
 
@@ -50,8 +39,21 @@ export function EmailAuthForm() {
     try {
       const supabase = createClient();
 
-      if (isSignup) {
-        const { error } = await supabase.auth.signUp({
+      // Try to sign in first
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (!signInError) {
+        // Success - redirect to home
+        window.location.href = "/";
+        return;
+      }
+
+      // If invalid credentials, try to create account
+      if (signInError.message.includes("Invalid login credentials")) {
+        const { error: signUpError } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -59,31 +61,20 @@ export function EmailAuthForm() {
           },
         });
 
-        if (error) {
-          if (error.message.includes("already registered")) {
-            setError(t("emailAlreadyRegistered"));
-          } else {
-            setError(error.message);
-          }
-        } else {
-          setSuccess(t("checkEmailForConfirmation"));
-        }
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (error) {
-          if (error.message.includes("Invalid login credentials")) {
+        if (signUpError) {
+          // If already registered, it means wrong password
+          if (signUpError.message.includes("already registered")) {
             setError(t("invalidCredentials"));
           } else {
-            setError(error.message);
+            setError(signUpError.message);
           }
         } else {
-          // Redirect handled by Supabase auth state change
-          window.location.href = "/";
+          // New account created - check email
+          setSuccess(t("accountCreatedCheckEmail"));
         }
+      } else {
+        // Other sign-in error
+        setError(signInError.message);
       }
     } catch {
       setError(t("somethingWentWrong"));
@@ -131,7 +122,7 @@ export function EmailAuthForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             disabled={isLoading}
-            autoComplete={isSignup ? "new-password" : "current-password"}
+            autoComplete="current-password"
             className="h-12 pr-10"
           />
           <button
@@ -149,32 +140,14 @@ export function EmailAuthForm() {
         </div>
       </div>
 
-      {isSignup && (
-        <div className="space-y-2">
-          <Label htmlFor="confirmPassword">{t("confirmPassword")}</Label>
-          <Input
-            id="confirmPassword"
-            type={showPassword ? "text" : "password"}
-            placeholder={t("confirmPasswordPlaceholder")}
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            disabled={isLoading}
-            autoComplete="new-password"
-            className="h-12"
-          />
-        </div>
-      )}
-
-      {!isSignup && (
-        <div className="text-right">
-          <Link
-            href="/auth/forgot-password"
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            {t("forgotPassword")}
-          </Link>
-        </div>
-      )}
+      <div className="text-right">
+        <Link
+          href="/auth/forgot-password"
+          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          {t("forgotPassword")}
+        </Link>
+      </div>
 
       <Button type="submit" className="w-full h-12" disabled={isLoading}>
         {isLoading ? (
@@ -182,46 +155,14 @@ export function EmailAuthForm() {
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             {t("loading")}
           </>
-        ) : isSignup ? (
-          t("createAccount")
         ) : (
           t("signIn")
         )}
       </Button>
 
-      <div className="text-center text-sm text-muted-foreground">
-        {isSignup ? (
-          <>
-            {t("alreadyHaveAccount")}{" "}
-            <button
-              type="button"
-              onClick={() => {
-                setMode("login");
-                setError(null);
-                setSuccess(null);
-              }}
-              className="text-primary hover:underline"
-            >
-              {t("signIn")}
-            </button>
-          </>
-        ) : (
-          <>
-            {t("dontHaveAccount")}{" "}
-            <button
-              type="button"
-              onClick={() => {
-                setMode("signup");
-                setError(null);
-                setSuccess(null);
-              }}
-              className="text-primary hover:underline"
-            >
-              {t("createAccount")}
-            </button>
-          </>
-        )}
-      </div>
+      <p className="text-center text-sm text-muted-foreground">
+        {t("signInOrCreateHint")}
+      </p>
     </form>
   );
 }

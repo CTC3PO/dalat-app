@@ -73,6 +73,8 @@
     "emailAlreadyRegistered": "This email is already registered. Try signing in instead.",
     "invalidCredentials": "Invalid email or password",
     "checkEmailForConfirmation": "Check your email for a confirmation link",
+    "accountCreatedCheckEmail": "Account created! Check your email to confirm.",
+    "signInOrCreateHint": "New here? We'll create your account automatically.",
     "somethingWentWrong": "Something went wrong. Please try again.",
     "resetPassword": "Reset password",
     "resetPasswordDescription": "Enter your email to receive a password reset link",
@@ -690,6 +692,14 @@
       "unsubscribed": "Unsubscribed",
       "bounced": "Bounced"
     }
+  },
+  "translations": {
+    "autoTranslatedFrom": "Auto-translated from {language}",
+    "reviewedFrom": "Translated from {language} (reviewed)",
+    "translatedFrom": "Translated from",
+    "showOriginal": "Show original",
+    "hideOriginal": "Hide original",
+    "mayContainErrors": "Machine translation may contain errors"
   },
   "organizerPortal": {
     "title": "Organizer Portal",
