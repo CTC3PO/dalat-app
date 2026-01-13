@@ -237,7 +237,10 @@ export function FlyerBuilder({
         )}
 
         {/* Title input overlay */}
-        <div className="absolute bottom-0 inset-x-0 p-3">
+        <div
+          className="absolute bottom-0 inset-x-0 p-3"
+          onClick={(e) => e.stopPropagation()}
+        >
           <Input
             value={title}
             onChange={(e) => onTitleChange(e.target.value)}
