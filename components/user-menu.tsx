@@ -2,7 +2,7 @@
 
 import { Link } from "@/lib/i18n/routing";
 import { useTranslations } from "next-intl";
-import { User, Settings, ExternalLink, Shield } from "lucide-react";
+import { User, Settings, ExternalLink, Shield, Building2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,10 +19,12 @@ interface UserMenuProps {
   role: UserRole;
 }
 
-const ADMIN_ROLES: UserRole[] = ["admin", "moderator", "organizer_verified", "contributor"];
+// Roles that can access /admin panel (organizers use /organizer portal instead)
+const ADMIN_ROLES: UserRole[] = ["admin", "moderator", "contributor"];
 
 export function UserMenu({ avatarUrl, displayName, username, role }: UserMenuProps) {
   const hasAdminAccess = ADMIN_ROLES.includes(role);
+  const isOrganizer = role === "organizer_verified";
   const t = useTranslations("userMenu");
   const tCommon = useTranslations("common");
 
@@ -94,6 +96,18 @@ export function UserMenu({ avatarUrl, displayName, username, role }: UserMenuPro
               <Link href="/admin" className="cursor-pointer">
                 <Shield className="w-4 h-4 mr-2" />
                 {t("admin")}
+              </Link>
+            </DropdownMenuItem>
+          </>
+        )}
+
+        {isOrganizer && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link href="/organizer" className="cursor-pointer">
+                <Building2 className="w-4 h-4 mr-2" />
+                {t("organizerPortal")}
               </Link>
             </DropdownMenuItem>
           </>

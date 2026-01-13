@@ -14,9 +14,10 @@ interface FestivalFormProps {
   userId: string;
   festival?: Festival;
   organizers: Organizer[];
+  redirectTo?: string;
 }
 
-export function FestivalForm({ userId, festival, organizers }: FestivalFormProps) {
+export function FestivalForm({ userId, festival, organizers, redirectTo = "/admin/festivals" }: FestivalFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [title, setTitle] = useState(festival?.title || "");
@@ -54,7 +55,7 @@ export function FestivalForm({ userId, festival, organizers }: FestivalFormProps
     }
 
     setIsSubmitting(false);
-    router.push("/admin/festivals");
+    router.push(redirectTo);
     router.refresh();
   };
 

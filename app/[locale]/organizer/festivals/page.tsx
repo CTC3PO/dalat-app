@@ -3,6 +3,7 @@ import Image from "next/image";
 import { ArrowLeft, Plus, Calendar, MapPin, BadgeCheck, Pencil } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import type { Festival } from "@/lib/types";
 
 async function getMyFestivals(userId: string) {
@@ -17,18 +18,9 @@ async function getMyFestivals(userId: string) {
   return (data ?? []) as Festival[];
 }
 
-async function getProfile(userId: string) {
+export default async function OrganizerFestivalsPage() {
   const supabase = await createClient();
-  const { data } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", userId)
-    .single();
-  return data;
-}
-
-export default async function AdminFestivalsPage() {
-  const supabase = await createClient();
+  const t = await getTranslations("organizerPortal");
 
   const {
     data: { user },
@@ -36,13 +28,6 @@ export default async function AdminFestivalsPage() {
 
   if (!user) {
     redirect("/auth/login");
-  }
-
-  const profile = await getProfile(user.id);
-
-  // Only admins can access festivals in admin panel (organizers use /organizer portal)
-  if (!profile || profile.role !== "admin") {
-    redirect("/");
   }
 
   const festivals = await getMyFestivals(user.id);
@@ -54,23 +39,23 @@ export default async function AdminFestivalsPage() {
         <div>
           <div className="flex items-center gap-2 mb-2">
             <Link
-              href="/admin"
+              href="/organizer"
               className="-ml-3 flex items-center gap-2 text-muted-foreground hover:text-foreground active:scale-95 transition-all px-3 py-2 rounded-lg"
             >
               <ArrowLeft className="w-4 h-4" />
             </Link>
-            <h1 className="text-2xl font-bold">My Festivals</h1>
+            <h1 className="text-2xl font-bold">{t("myFestivals")}</h1>
           </div>
           <p className="text-muted-foreground">
             Manage your festivals and official events
           </p>
         </div>
         <Link
-          href="/admin/festivals/new"
+          href="/organizer/festivals/new"
           className="flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors font-medium"
         >
           <Plus className="h-4 w-4" />
-          New Festival
+          {t("createFestival")}
         </Link>
       </div>
 
@@ -84,16 +69,16 @@ export default async function AdminFestivalsPage() {
       ) : (
         <div className="text-center py-20 border rounded-lg bg-card">
           <Calendar className="h-16 w-16 mx-auto mb-4 text-muted-foreground/50" />
-          <h3 className="text-xl font-semibold mb-2">No Festivals Yet</h3>
+          <h3 className="text-xl font-semibold mb-2">{t("noFestivalsYet")}</h3>
           <p className="text-muted-foreground mb-6">
             Create your first festival to get started
           </p>
           <Link
-            href="/admin/festivals/new"
+            href="/organizer/festivals/new"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors font-medium"
           >
             <Plus className="h-5 w-5" />
-            Create Festival
+            {t("createFestival")}
           </Link>
         </div>
       )}
@@ -168,7 +153,7 @@ function FestivalRow({ festival }: { festival: Festival }) {
       {/* Actions */}
       <div className="flex items-center gap-2">
         <Link
-          href={`/admin/festivals/${festival.id}/edit`}
+          href={`/organizer/festivals/${festival.id}/edit`}
           className="flex items-center gap-1 px-3 py-1.5 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors text-sm"
         >
           <Pencil className="h-3 w-3" />
