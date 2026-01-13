@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import {
   Upload,
   Link as LinkIcon,
@@ -41,6 +41,28 @@ export function FlyerBuilder({
   const [isDragOver, setIsDragOver] = useState(false);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const previewUrlRef = useRef<string | null>(previewUrl);
+
+  // Keep ref in sync with state for cleanup
+  useEffect(() => {
+    previewUrlRef.current = previewUrl;
+  }, [previewUrl]);
+
+  // Cleanup blob URL on unmount
+  useEffect(() => {
+    return () => {
+      if (previewUrlRef.current?.startsWith("blob:")) {
+        URL.revokeObjectURL(previewUrlRef.current);
+      }
+    };
+  }, []);
+
+  // Helper to revoke existing blob URL before setting a new one
+  const revokeExistingBlobUrl = useCallback(() => {
+    if (previewUrl?.startsWith("blob:")) {
+      URL.revokeObjectURL(previewUrl);
+    }
+  }, [previewUrl]);
 
   // Handle file selection/drop for upload mode
   const handleFile = useCallback(
@@ -58,12 +80,15 @@ export function FlyerBuilder({
         return;
       }
 
+      // Revoke existing blob URL before creating a new one
+      revokeExistingBlobUrl();
+
       const objectUrl = URL.createObjectURL(file);
       setPreviewUrl(objectUrl);
       setPendingFile(file);
       onImageChange(objectUrl, file);
     },
-    [onImageChange]
+    [onImageChange, revokeExistingBlobUrl]
   );
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -109,6 +134,8 @@ export function FlyerBuilder({
       // Try to load the image to verify it's valid
       const img = new Image();
       img.onload = () => {
+        // Revoke existing blob URL before setting external URL
+        revokeExistingBlobUrl();
         setPreviewUrl(urlInput.trim());
         onImageChange(urlInput.trim());
         setIsLoadingUrl(false);
@@ -147,6 +174,8 @@ export function FlyerBuilder({
       }
 
       const data = await response.json();
+      // Revoke existing blob URL before setting generated image
+      revokeExistingBlobUrl();
       setPreviewUrl(data.imageUrl);
       onImageChange(data.imageUrl);
     } catch (err) {
