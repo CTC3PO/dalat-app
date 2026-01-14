@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { safeSingle, singleOrNull } from '@/lib/supabase/helpers';
 
 interface RouteParams { params: Promise<{ slug: string }>; }
 
@@ -9,8 +10,13 @@ export async function GET(request: Request, { params }: RouteParams) {
   const { searchParams } = new URL(request.url);
   const includeBanned = searchParams.get('banned') === 'true';
 
-  const { data: tribe } = await supabase.from('tribes').select('id').eq('slug', slug).single();
-  if (!tribe) return NextResponse.json({ error: 'Tribe not found' }, { status: 404 });
+  const tribeResult = await safeSingle(
+    supabase.from('tribes').select('id').eq('slug', slug).single()
+  );
+  if (!tribeResult.success) {
+    return NextResponse.json({ error: tribeResult.error }, { status: tribeResult.status });
+  }
+  const tribe = tribeResult.data;
 
   let query = supabase
     .from('tribe_members')
@@ -41,17 +47,27 @@ export async function PUT(request: Request, { params }: RouteParams) {
 
   if (!user_id) return NextResponse.json({ error: 'user_id required' }, { status: 400 });
 
-  const { data: tribe } = await supabase.from('tribes').select('id, created_by').eq('slug', slug).single();
-  if (!tribe) return NextResponse.json({ error: 'Tribe not found' }, { status: 404 });
+  const tribeResult = await safeSingle(
+    supabase.from('tribes').select('id, created_by').eq('slug', slug).single()
+  );
+  if (!tribeResult.success) {
+    return NextResponse.json({ error: tribeResult.error }, { status: tribeResult.status });
+  }
+  const tribe = tribeResult.data;
 
-  const { data: membership } = await supabase.from('tribe_members').select('role').eq('tribe_id', tribe.id).eq('user_id', user.id).single();
+  // Membership check - null is valid (user might not be a member)
+  const membership = await singleOrNull(
+    supabase.from('tribe_members').select('role').eq('tribe_id', tribe.id).eq('user_id', user.id).single()
+  );
   const isAdmin = tribe.created_by === user.id || membership?.role === 'leader' || membership?.role === 'admin';
   if (!isAdmin) return NextResponse.json({ error: 'Not authorized' }, { status: 403 });
   if (user_id === tribe.created_by) return NextResponse.json({ error: 'Cannot modify creator' }, { status: 400 });
 
   // Only leaders can promote to leader or demote from leader
   if (role === 'leader' || role === 'admin') {
-    const { data: targetMember } = await supabase.from('tribe_members').select('role').eq('tribe_id', tribe.id).eq('user_id', user_id).single();
+    const targetMember = await singleOrNull(
+      supabase.from('tribe_members').select('role').eq('tribe_id', tribe.id).eq('user_id', user_id).single()
+    );
     if (targetMember?.role === 'leader' && membership?.role !== 'leader' && tribe.created_by !== user.id) {
       return NextResponse.json({ error: 'Only leaders can modify other leaders' }, { status: 403 });
     }
@@ -78,10 +94,17 @@ export async function DELETE(request: Request, { params }: RouteParams) {
 
   if (!user_id) return NextResponse.json({ error: 'user_id required' }, { status: 400 });
 
-  const { data: tribe } = await supabase.from('tribes').select('id, created_by').eq('slug', slug).single();
-  if (!tribe) return NextResponse.json({ error: 'Tribe not found' }, { status: 404 });
+  const tribeResult = await safeSingle(
+    supabase.from('tribes').select('id, created_by').eq('slug', slug).single()
+  );
+  if (!tribeResult.success) {
+    return NextResponse.json({ error: tribeResult.error }, { status: tribeResult.status });
+  }
+  const tribe = tribeResult.data;
 
-  const { data: membership } = await supabase.from('tribe_members').select('role').eq('tribe_id', tribe.id).eq('user_id', user.id).single();
+  const membership = await singleOrNull(
+    supabase.from('tribe_members').select('role').eq('tribe_id', tribe.id).eq('user_id', user.id).single()
+  );
   const isAdmin = tribe.created_by === user.id || membership?.role === 'leader' || membership?.role === 'admin';
   if (!isAdmin) return NextResponse.json({ error: 'Not authorized' }, { status: 403 });
   if (user_id === tribe.created_by) return NextResponse.json({ error: 'Cannot remove creator' }, { status: 400 });

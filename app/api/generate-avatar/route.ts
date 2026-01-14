@@ -2,28 +2,8 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
-// Simple in-memory rate limiter (per-instance, resets on cold start)
-// For production, consider Upstash Redis or a Supabase table
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 const RATE_LIMIT = 5; // requests per window
 const RATE_WINDOW_MS = 60 * 60 * 1000; // 1 hour
-
-function checkRateLimit(userId: string): { allowed: boolean; remaining: number } {
-  const now = Date.now();
-  const record = rateLimitMap.get(userId);
-
-  if (!record || now > record.resetAt) {
-    rateLimitMap.set(userId, { count: 1, resetAt: now + RATE_WINDOW_MS });
-    return { allowed: true, remaining: RATE_LIMIT - 1 };
-  }
-
-  if (record.count >= RATE_LIMIT) {
-    return { allowed: false, remaining: 0 };
-  }
-
-  record.count++;
-  return { allowed: true, remaining: RATE_LIMIT - record.count };
-}
 
 // Sanitize display name to prevent prompt injection
 function sanitizeDisplayName(name: string | undefined): string {
@@ -48,11 +28,23 @@ export async function POST(request: Request) {
       );
     }
 
-    // Rate limiting
-    const rateCheck = checkRateLimit(user.id);
-    if (!rateCheck.allowed) {
+    // Database-backed rate limiting (survives cold starts)
+    const { data: rateCheck, error: rateError } = await supabase.rpc('check_rate_limit', {
+      p_action: 'generate_avatar',
+      p_limit: RATE_LIMIT,
+      p_window_ms: RATE_WINDOW_MS,
+    });
+
+    if (rateError) {
+      console.error("[generate-avatar] Rate limit check failed:", rateError);
+      // Fail open - allow request but log the error
+    } else if (!rateCheck?.allowed) {
       return NextResponse.json(
-        { error: "Rate limit exceeded. Try again in an hour.", remaining: 0 },
+        {
+          error: "Rate limit exceeded. Try again in an hour.",
+          remaining: 0,
+          reset_at: rateCheck?.reset_at,
+        },
         { status: 429 }
       );
     }
