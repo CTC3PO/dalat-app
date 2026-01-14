@@ -15,21 +15,25 @@ async function ErrorContent({
   const isExpiredLink = error?.includes("expired") || error?.includes("invalid");
   const isAlreadyConfirmed = error?.includes("already") || error?.includes("confirmed");
 
+  // User-friendly hint based on error type
+  const friendlyHint = isAlreadyConfirmed
+    ? "Your email may already be confirmed."
+    : isExpiredLink
+    ? "This link has expired or was already used."
+    : null;
+
   return (
     <div className="space-y-4">
-      {isAlreadyConfirmed ? (
-        <p className="text-sm text-muted-foreground">
-          Your email may already be confirmed. Try signing in below.
-        </p>
-      ) : isExpiredLink ? (
-        <p className="text-sm text-muted-foreground">
-          This link has expired or was already used. Please request a new one.
-        </p>
-      ) : error ? (
-        <p className="text-sm text-muted-foreground">{error}</p>
+      {error ? (
+        <>
+          <p className="text-sm text-muted-foreground">{error}</p>
+          {friendlyHint && (
+            <p className="text-sm text-muted-foreground">{friendlyHint}</p>
+          )}
+        </>
       ) : (
         <p className="text-sm text-muted-foreground">
-          Something went wrong. Your email may already be confirmed - try signing in.
+          Something went wrong. Please try signing in or request a new link.
         </p>
       )}
 

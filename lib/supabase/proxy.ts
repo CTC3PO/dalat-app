@@ -59,6 +59,7 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith('/_next/') ||
     pathname.startsWith('/auth/callback') ||
     pathname.startsWith('/auth/confirm') ||
+    pathname.startsWith('/auth/verify') ||
     pathname.includes('.');
 
   if (!shouldSkipLocale) {
