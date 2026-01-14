@@ -7,30 +7,30 @@ import { type NextRequest } from "next/server";
  * preventing email security scanners from consuming single-use tokens.
  *
  * Flow:
- * 1. Email contains link to /auth/verify?token=...&type=...
- * 2. This route redirects to /en/auth/verify?url=<encoded-supabase-url>
+ * 1. Email contains link to /auth/verify?token_hash=...&type=...
+ * 2. This route redirects to /en/auth/verify?token_hash=...&type=...
  * 3. User clicks "Confirm" button on that page
- * 4. Browser redirects to actual Supabase verification URL
+ * 4. Browser redirects to /auth/confirm which verifies via verifyOtp()
+ *
+ * Note: We use token_hash instead of token to bypass the PKCE flow,
+ * which fixes authentication issues when magic links open in a different
+ * browser than the PWA (where the PKCE verifier is stored).
  */
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
-  const token = url.searchParams.get("token");
+  const tokenHash = url.searchParams.get("token_hash");
   const type = url.searchParams.get("type") || "magiclink";
   const locale = url.searchParams.get("locale") || "en";
-  const redirectTo = url.searchParams.get("redirect_to") || `${url.origin}/auth/callback`;
 
-  if (!token) {
+  if (!tokenHash) {
     return NextResponse.redirect(new URL(`/${locale}/auth/error?error=No token provided`, url.origin));
   }
 
-  // Build the actual Supabase verification URL
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const verifyUrl = `${supabaseUrl}/auth/v1/verify?token=${token}&type=${type}&redirect_to=${encodeURIComponent(redirectTo)}`;
-
-  // Redirect to our confirmation page with the encoded verification URL
+  // Redirect to our confirmation page with token_hash
   // Use the locale from the email template for proper localization
   const confirmPageUrl = new URL(`/${locale}/auth/verify`, url.origin);
-  confirmPageUrl.searchParams.set("url", encodeURIComponent(verifyUrl));
+  confirmPageUrl.searchParams.set("token_hash", tokenHash);
+  confirmPageUrl.searchParams.set("type", type);
 
   return NextResponse.redirect(confirmPageUrl);
 }

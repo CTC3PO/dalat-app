@@ -12,17 +12,18 @@ function VerifyContent() {
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
 
-  // Get the original Supabase verification URL from params
-  const verifyUrl = searchParams.get("url");
+  // Get token_hash and type from params (bypasses PKCE for PWA compatibility)
+  const tokenHash = searchParams.get("token_hash");
+  const type = searchParams.get("type") || "magiclink";
 
   const handleConfirm = () => {
-    if (!verifyUrl) return;
+    if (!tokenHash) return;
     setIsLoading(true);
-    // Redirect to the actual Supabase verification URL
-    window.location.href = decodeURIComponent(verifyUrl);
+    // Redirect to /auth/confirm which uses verifyOtp() - no PKCE required
+    window.location.href = `/auth/confirm?token_hash=${encodeURIComponent(tokenHash)}&type=${type}`;
   };
 
-  if (!verifyUrl) {
+  if (!tokenHash) {
     return (
       <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
         <div className="w-full max-w-sm">

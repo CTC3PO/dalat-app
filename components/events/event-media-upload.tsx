@@ -189,15 +189,18 @@ export function EventMediaUpload({
     setError(null);
     setIsLoadingUrl(true);
 
+    // Capture the URL value at call time to avoid closure issues
+    const urlToLoad = urlInput.trim();
+
     try {
-      const url = new URL(urlInput.trim());
+      const url = new URL(urlToLoad);
       if (!url.protocol.startsWith("http")) throw new Error();
 
       const img = new Image();
       img.onload = () => {
-        setPreviewUrl(urlInput.trim());
+        setPreviewUrl(urlToLoad);
         setPreviewIsVideo(false);
-        onMediaChange(urlInput.trim());
+        onMediaChange(urlToLoad);
         setIsLoadingUrl(false);
         setShowUrlInput(false);
         setUrlInput("");
@@ -206,7 +209,7 @@ export function EventMediaUpload({
         setError(t("invalidImage"));
         setIsLoadingUrl(false);
       };
-      img.src = urlInput.trim();
+      img.src = urlToLoad;
     } catch {
       setError(t("invalidUrl"));
       setIsLoadingUrl(false);
