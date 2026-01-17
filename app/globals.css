@@ -77,6 +77,32 @@ a[href="https://novu.co"] {
   fill: hsl(var(--foreground)) !important;
 }
 
+/* Novu inbox mobile scroll lock - prevents background from moving when swiping in inbox */
+[class*="nv-inbox__popover"],
+[class*="nv-popover"],
+[class*="nv-root"] [role="dialog"] {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y pinch-zoom;
+}
+
+/* Lock body scroll when Novu popover is open */
+body:has([class*="nv-inbox__popover"]),
+body:has([class*="nv-popover"]),
+body:has([class*="nv-root"] [role="dialog"]) {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+/* Ensure Novu notification list doesn't propagate scroll */
+[class*="nv-notificationList"],
+[class*="nv-notification-list"],
+[class*="nv-inbox"] [role="listbox"],
+[class*="nv-inbox"] [role="list"] {
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+}
+
 /* Scrollbar hide utility for immersive scroll-snap */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
