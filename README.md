@@ -1,6 +1,6 @@
 # dalat.app
 
-Events without the noise. Discover and organize events in Da Lat.
+Events · People · Memories · Love · Đà Lạt 🇻🇳
 
 ## Development
 

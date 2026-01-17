@@ -6,7 +6,7 @@ const siteUrl = "https://dalat.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "dalat.app - Events without the noise",
+  title: "dalat.app · Events · People · Memories · Love",
   description: "Discover and organize events in Da Lat",
   openGraph: {
     type: "website",
